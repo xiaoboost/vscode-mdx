@@ -26,6 +26,8 @@ module.exports =  {
         // 允许对具有初始化语句的变量额外标注类型
         '@typescript-eslint/no-inferrable-types': 'off',
         // 允许使用 namespace
-        '@typescript-eslint/no-namespace': 'off'
+        '@typescript-eslint/no-namespace': 'off',
+        // 函数允许不显式提供返回类型
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
     },
 };

@@ -3,10 +3,17 @@
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clear": "rimraf ./dist/generated",
+    "watch": "pnpm run clear && ts-node-transpile-only --project tsconfig.json ./build/webpack.ts --development",
+    "build": "pnpm run clear && ts-node-transpile-only --project tsconfig.json ./build/webpack.ts --production",
+    "build:analyze": "pnpm run clear && ts-node-transpile-only --project tsconfig.json ./build/webpack.ts --production --analyze"
   },
-  "author": "",
+  "author": "xiaoboost",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xiaoboost/vscode-extension-vue"
+  },
   "main": "./dist/js/client.js",
   "activationEvents": [
     "onLanguage:vue"
@@ -48,32 +55,39 @@
   },
   "dependencies": {
     "line-column": "^1.0.2",
-    "lodash": "^4.17.20",
     "path-browserify": "^1.0.1",
-    "tslib": "^2.0.1",
-    "typescript": "^3.9.7"
+    "typescript": "^4.0.2",
+    "vscode-languageclient": "^6.1.3",
+    "vscode-languageserver": "^6.1.1",
+    "vscode-languageserver-textdocument": "^1.0.1"
   },
   "devDependencies": {
     "@types/copy-webpack-plugin": "^6.0.0",
     "@types/friendly-errors-webpack-plugin": "^0.1.2",
     "@types/generate-json-webpack-plugin": "^0.3.1",
     "@types/line-column": "^1.0.0",
-    "@types/lodash": "^4.14.159",
-    "@types/node": "^14.0.27",
+    "@types/node": "^14.6.0",
+    "@types/progress-bar-webpack-plugin": "^2.1.0",
     "@types/terser-webpack-plugin": "^4.1.0",
+    "@types/vscode": "^1.48.0",
     "@types/webpack-bundle-analyzer": "^3.8.0",
-    "@typescript-eslint/eslint-plugin": "^3.9.0",
-    "@typescript-eslint/parser": "^3.9.0",
+    "@typescript-eslint/eslint-plugin": "^3.9.1",
+    "@typescript-eslint/parser": "^3.9.1",
     "chalk": "^4.1.0",
     "copy-webpack-plugin": "^6.0.3",
     "eslint": "^7.7.0",
     "friendly-errors-webpack-plugin": "^1.7.0",
     "generate-json-webpack-plugin": "^1.0.0",
     "progress-bar-webpack-plugin": "^2.1.0",
+    "require-split-chunk-webpack-plugin": "^1.0.1",
+    "rimraf": "^3.0.2",
     "terser-webpack-plugin": "^4.1.0",
     "ts-loader": "^8.0.2",
+    "ts-node": "^9.0.0",
     "tsconfig-paths-webpack-plugin": "^3.3.0",
+    "tslib": "^2.0.1",
     "webpack": "^4.44.1",
-    "webpack-bundle-analyzer": "^3.8.0"
+    "webpack-bundle-analyzer": "^3.8.0",
+    "yaml": "^1.10.0"
   }
 }
