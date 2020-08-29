@@ -170,50 +170,67 @@ class Parser {
         }
 
         const node = this.curNode as Element;
-        const text = this.scanner.tokenText;
 
-        const attr: Attribute | Command = {
-            type: NodeType.Attribute,
-            parent: node,
-            name: this.scanner.tokenText,
-            range: this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd),
-            nameEnd: this.positionAt(this.scanner.tokenEnd),
-            valueStart: utils.nullLoc,
-        };
+        let text = this.scanner.tokenText;
 
         // 绑定值
-        if (attr.name[0] === ':') {
-            attr.name = `v-bind${attr.name}`;
+        if (text[0] === ':') {
+            text = `v-bind${text}`;
         }
         // 事件
-        else if (attr.name[0] === '@') {
-            attr.name = `v-on:${attr.name.slice(1)}`;
+        else if (text[0] === '@') {
+            text = `v-on:${text.slice(1)}`;
         }
 
         // 指令
-        if (attr.name.indexOf('v-') === 0) {
+        if (text.indexOf('v-') === 0) {
             if (!node.commands) {
                 node.commands = [];
             }
 
-            if (node.commands.find(({ name }) => name === attr.name)) {
+            if (node.commands.find(({ originName }) => originName === text)) {
                 this.warnings.push({
                     message: errorText.attributeDuplicate,
                     range: attr.range,
                 });
             }
 
-            const [commandName, bind] = attr.name.split(':');
+            const [comName, argFull] = text.split(':');
+            const [arg, ...modifiers] = argFull.split('.');
             const command: Command = {
-                ...attr,
                 type: NodeType.Command,
-            }
+                originName: text,
+                parent: node,
+                name: comName,
+                value: '',
+                range: this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd),
+                nameEnd: this.positionAt(this.scanner.tokenEnd),
+                valueStart: utils.nullLoc,
+                arg: {
+                    name: arg,
+                    range: utils.nullRange,
+                },
+                modifiers: [],
+            };
+
+            node.commands.push(command);
+            this.curNode = command;
         }
         // 属性
         else {
             if (!node.attrs) {
                 node.attrs = [];
             }
+
+            const attr: Attribute = {
+                type: NodeType.Attribute,
+                parent: node,
+                value: '',
+                name: this.scanner.tokenText,
+                range: this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd),
+                nameEnd: this.positionAt(this.scanner.tokenEnd),
+                valueStart: utils.nullLoc,
+            };
 
             if (node.attrs.find(({ name }) => name === attr.name)) {
                 this.warnings.push({
@@ -225,9 +242,9 @@ class Parser {
             node.attrs.push(attr);
 
             // TODO: 这里是否需要验证 style
-        }
 
-        this.curNode = attr;
+            this.curNode = attr;
+        }
     }
 
     private checkElement(node = this.curNode) {
@@ -247,7 +264,7 @@ class Parser {
     }
 
     private checkFor(node: Element) {
-
+        // ..
     }
 
     parse() {

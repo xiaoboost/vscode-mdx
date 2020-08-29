@@ -70,18 +70,17 @@ export class Scanner {
         return type;
     }
 
-    private scanCodeContent(tagName: string) {
-        // see http://stackoverflow.com/questions/14574471/how-do-browsers-parse-a-script-tag-exactly
-        let sciptState = 1;
+    private scanCodeContent(tagName: 'Script' | 'Style') {
+        const { _pointer: pointer } = this;
+        const matcher = new RegExp(`\\/\\*|\\/\\/|'|"|\`|<\\/${tagName.toLowerCase()}\\s*\\/?>?`, 'i');
 
-        // TODO: 需要跳过注释和文本字符串内的所有内容
         while (!pointer.eos) {
-            const match = pointer.advanceIfRegExp(/\/\*|\/\/|'|"|<\/script\s*\/?>?/i);
+            const match = pointer.advanceIfRegExp(matcher);
 
             // 未匹配到结束标志，扫描结束
             if (match.length === 0) {
                 pointer.goToEnd();
-                return this.finishToken(startOffset, TokenType.Script);
+                return this.finishToken(this.tokenStart, TokenType[tagName]);
             }
             else if (match === '/*') {
                 // ..
@@ -89,11 +88,16 @@ export class Scanner {
             else if (match === '//') {
                 // ..
             }
-            // ' 或者 "
-            else if (match === '\'' || match === '"') {
+            else if (match === '\'') {
                 // ..
             }
-            // </script
+            else if (match === '"') {
+                // ..
+            }
+            else if (match === '`') {
+                // ..
+            }
+            // 结束标签
             else {
                 // ..
             }
@@ -101,8 +105,8 @@ export class Scanner {
 
         this._state = ScannerState.WithinContent;
 
-        if (startOffset < pointer.pos) {
-            return this.finishToken(startOffset, TokenType.Script);
+        if (this.tokenStart < pointer.pos) {
+            return this.finishToken(this.tokenStart, TokenType.Script);
         }
 
         return this.scan();
@@ -389,52 +393,10 @@ export class Scanner {
                 }
             }
             case ScannerState.WithinScriptContent: {
-                this.scanCodeContent('script', startOffset);
-                // see http://stackoverflow.com/questions/14574471/how-do-browsers-parse-a-script-tag-exactly
-                let sciptState = 1;
-
-                // TODO: 需要跳过注释和文本字符串内的所有内容
-                while (!pointer.eos) {
-                    const match = pointer.advanceIfRegExp(/\/\*|\/\/|'|"|<\/script\s*\/?>?/i);
-
-                    // 未匹配到结束标志，扫描结束
-                    if (match.length === 0) {
-                        pointer.goToEnd();
-                        return this.finishToken(startOffset, TokenType.Script);
-                    }
-                    else if (match === '/*') {
-                        // ..
-                    }
-                    else if (match === '//') {
-                        // ..
-                    }
-                    // ' 或者 "
-                    else if (match === '\'' || match === '"') {
-                        // ..
-                    }
-                    // </script
-                    else {
-                        // ..
-                    }
-                }
-
-                this._state = ScannerState.WithinContent;
-
-                if (startOffset < pointer.pos) {
-                    return this.finishToken(startOffset, TokenType.Script);
-                }
-
-                return this.scan();
+                return this.scanCodeContent('Script');
             }
             case ScannerState.WithinStyleContent: {
-                pointer.advanceUntilRegExp(/<\/style/i);
-                this._state = ScannerState.WithinContent;
-
-                if (startOffset < pointer.pos) {
-                    return this.finishToken(startOffset, TokenType.Style);
-                }
-
-                return this.scan();
+                return this.scanCodeContent('Style');
             }
         }
 

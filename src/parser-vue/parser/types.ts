@@ -19,7 +19,7 @@ export enum NodeType {
     ContentMustache,
 }
 
-export type Node = Root | ContentText | ContentMustache | Attribute | Element | Comment;
+export type Node = Root | ContentText | ContentMustache | Attribute | Command | Element | Comment;
 export type TextNode = ContentText | ContentMustache;
 
 export interface ParserError {
@@ -78,7 +78,7 @@ export interface Attribute extends NodeCommon {
     /** 属性名称 */
     name: string;
     /** 属性值 */
-    value?: string;
+    value: string | boolean;
     /** 属性名称结束位置 */
     nameEnd: Location;
     /** 属性值开始位置 */
@@ -88,30 +88,40 @@ export interface Attribute extends NodeCommon {
 export interface Command extends NodeCommon {
     type: NodeType.Command;
     parent?: Element;
-    /** 属性名称 */
+    /** 指令作为属性的完整名称 */
+    originName: string;
+    /** 指令名称 */
     name: string;
     /** 属性值 */
-    value?: string;
+    value: string | boolean;
     /**
      * 指令名称结束位置
      *  - 冒号前的位置
      */
     nameEnd: Location;
-    /** 指令修饰符开始位置 */
     /**
-     * 指令绑定属性名称开始位置
-     *  - 冒号后的位置
+     * 属性值开始位置
+     *  - 等号或第一个引号后的位置
      */
-    /**
-     * 指令绑定属性名称结束位置
-     *  - 整个指令等号之前的位置
-     */
-    /** 指令值值开始位置 */
     valueStart: Location;
-    /** 绑定的变量名称 */
-    bind?: string;
-    /** 指令修饰符 */
-    modifier?: string[];
+    /**
+     * 指令参数部分
+     *  - `:`之后的部分
+     *  - `v-bind:test="test"`中`'test'`部分
+     */
+    arg?: {
+        name: string;
+        range: Range;
+    };
+    /**
+     * 指令修饰符
+     *  - `.`之后的部分
+     *  - `v-on:click.left.stop`中`['left', 'stop']`的部分
+     */
+    modifiers?: {
+        name: string;
+        range: Range;
+    }[];
 }
 
 export interface ParserOptions {
