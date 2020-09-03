@@ -6,7 +6,7 @@
         "strictPropertyInitialization": true,
         "moduleResolution": "node",
         "target": "ESNext",
-        "module": "CommonJS",
+        "module": "ESNext",
         "allowSyntheticDefaultImports": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,
