@@ -59,7 +59,7 @@ export class Scanner {
     }
 
     private nextAttributeName() {
-        return this._pointer.advanceIfRegExp(/^[^\s"'></=\x00-\x0F\x7F\x80-\x9F]*/);
+        return this._pointer.advanceIfRegExp(/^[:@]?[^\s"':.></=\x00-\x0F\x7F\x80-\x9F]*/);
     }
 
     private finishToken(startOffset: number, type: TokenType, errorMessage?: string) {
@@ -318,7 +318,7 @@ export class Scanner {
 
                 if (pointer.advanceIfChar(code.EQS)) {
                     this.state = ScannerState.BeforeAttributeValue;
-                    return this.finishToken(startOffset, TokenType.DelimiterAssign);
+                    return this.finishToken(startOffset, TokenType.AttributeDelimiter);
                 }
 
                 this.state = ScannerState.WithinTag;
@@ -351,12 +351,12 @@ export class Scanner {
                 if (this._lastAttrMark) {
                     if (pointer.advanceIfChar(this._lastAttrMark)) {
                         this.state = ScannerState.WithinTag;
-                        return this.finishToken(startOffset, TokenType.AttributeValueMark);
+                        return this.finishToken(startOffset, TokenType.AttributeMark);
                     }
                     else {
                         const markChar = String.fromCharCode(this._lastAttrMark);
                         pointer.advanceUntilRegExp(new RegExp(`({{|${markChar})`));
-                        return this.finishToken(startOffset, TokenType.AttributeValueText);
+                        return this.finishToken(startOffset, TokenType.AttributeValue);
                     }
                 }
                 else {
@@ -389,7 +389,7 @@ export class Scanner {
 
                     // 纯文本，直到 /> > 以及所有空白字符
                     pointer.advanceUntilRegExp(/(\s|\/>|>)/);
-                    return this.finishToken(startOffset, TokenType.AttributeValueText);
+                    return this.finishToken(startOffset, TokenType.AttributeValue);
                 }
             }
             case ScannerState.WithinScriptContent: {

@@ -127,12 +127,16 @@ export interface Command extends NodeCommon {
 export interface ParserOptions {
     location?: boolean;
     errorDetail?: boolean;
-    /** 项目根目录路径 */
-    original?: string;
+    /**
+     * 项目根目录路径
+     *  - 默认值是`/`
+     */
+    workspace?: string;
     /**
      * 当前文件路径
      *  - 可以是绝对路径
      *  - 也可以是相对项目根目录路径
+     *  - 默认值是`/index.vue`
      */
     filePath?: string;
 }

@@ -26,7 +26,7 @@ export * from './types';
 class Parser {
     readonly code: string;
     readonly scanner: Scanner;
-    readonly options: ParserOptions;
+    readonly options: Required<ParserOptions>;
     readonly errors: ParserError[] = [];
     readonly warnings: ParserError[] = [];
 
@@ -48,18 +48,16 @@ class Parser {
         this.code = code;
         this.scanner = new Scanner(code);
         this.options = {
-            location: opt.location || true,
-            errorDetail: opt.errorDetail || false,
-            original: opt.original || '',
-            filePath: opt.filePath || '',
+            workspace: opt.workspace ?? '/',
+            filePath: opt.filePath ?? './index.vue',
+            location: opt.location ?? true,
+            errorDetail: opt.errorDetail ?? false,
         };
 
-        const { rangeAt, positionAt } = utils.findLocation(code, opt.location);
-        const inputPath = this.options.filePath || '';
+        const { filePath, location, workspace } = this.options;
+        const { rangeAt, positionAt } = utils.findLocation(code, location);
 
-        this.options.filePath = path.isAbsolute(inputPath)
-            ? inputPath
-            : path.join(this.options.original || '', inputPath);
+        this.options.filePath = path.isAbsolute(filePath) ? filePath : path.join(workspace, filePath);
 
         this.rangeAt = rangeAt;
         this.positionAt = positionAt;
@@ -163,7 +161,6 @@ class Parser {
         }
     }
 
-    // TODO:
     private  addAttr() {
         if (this.curNode.type === NodeType.Attribute) {
             this.curNode = this.curNode.parent as Element;
@@ -188,30 +185,53 @@ class Parser {
                 node.commands = [];
             }
 
-            if (node.commands.find(({ originName }) => originName === text)) {
-                this.warnings.push({
-                    message: errorText.attributeDuplicate,
-                    range: attr.range,
-                });
-            }
-
             const [comName, argFull] = text.split(':');
-            const [arg, ...modifiers] = argFull.split('.');
+            const [arg, ...modifiers] = (argFull || '').split('.');
+            const commandStart = this.positionAt(this.scanner.tokenStart);
+            const atCommandOffset = (offset: number) => ({
+                line: commandStart.line,
+                col: (commandStart.col ?? 0) + offset,
+                offset: this.scanner.tokenStart + offset,
+            });
+            const commandNameEnd = atCommandOffset(comName.length);
             const command: Command = {
                 type: NodeType.Command,
                 originName: text,
                 parent: node,
-                name: comName,
+                // 指令名称去掉前面的 v- 前缀
+                name: comName.substring(2),
                 value: '',
-                range: this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd),
-                nameEnd: this.positionAt(this.scanner.tokenEnd),
-                valueStart: utils.nullLoc,
-                arg: {
-                    name: arg,
-                    range: utils.nullRange,
+                range: {
+                    start: commandStart,
+                    end: this.positionAt(this.scanner.tokenEnd),
                 },
-                modifiers: [],
+                nameEnd: commandNameEnd,
+                valueStart: { ...utils.nullLoc },
             };
+            
+            // 判断重复
+            if (node.commands.find(({ originName }) => originName === text)) {
+                this.warnings.push({
+                    message: errorText.commandDuplicate,
+                    range: command.range,
+                });
+            }
+
+            // 有绑定参数
+            if (arg) {
+                command.arg = {
+                    name: arg,
+                    range: {
+                        start: atCommandOffset(comName.length + 1),
+                        end: atCommandOffset(comName.length + arg.length + 1),
+                    },
+                };
+
+                // 有修饰符
+                if (modifiers.length > 0) {
+                    
+                }
+            }
 
             node.commands.push(command);
             this.curNode = command;
@@ -426,21 +446,8 @@ class Parser {
                     break;
                 }
                 case TokenType.ContentMustacheEnd: {
-                    const parent = this.curNode.parent as Node;
-                    const endPosition = this.positionAt(this.scanner.tokenEnd);
-
-                    if (parent.type === NodeType.Element && parent.tag === 'view') {
-                        this.warnings.push({
-                            message: errorText.viewEleCannotContainMustache,
-                            range: {
-                                start: { ...this.curNode.range.start },
-                                end: { ...endPosition },
-                            },
-                        });
-                    }
-
-                    this.curNode.range.end = endPosition;
-                    this.curNode = parent;
+                    this.curNode.range.end = this.positionAt(this.scanner.tokenEnd);
+                    this.curNode = this.curNode.parent as Node;
                     break;
                 }
                 case TokenType.ContentMustache: {
@@ -460,7 +467,7 @@ class Parser {
                 }
                 case TokenType.Unknown: {
                     this.errors.push({
-                        message: this.scanner.tokenError || '',
+                        message: this.scanner.tokenError ?? '',
                         range: this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd),
                     });
 
