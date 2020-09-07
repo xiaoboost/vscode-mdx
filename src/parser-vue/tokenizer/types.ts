@@ -1,7 +1,5 @@
-export enum TokenType {
-    StartCommentTag,
-    Comment,
-    EndCommentTag,
+export enum TokenKind {
+    // Tag
     StartTagOpen,
     StartTagClose,
     StartTagSelfClose,
@@ -9,18 +7,31 @@ export enum TokenType {
     EndTagOpen,
     EndTagClose,
     EndTag,
+
+    // Comment
+    Comment,
+    StartCommentTag,
+    EndCommentTag,
+
+    // Special tags
     Script,
     Style,
+
+    // Attributes
     AttributeName,
     AttributeArgument,
     AttributeModifier,
     AttributeDelimiter,
     AttributeMark,
     AttributeValue,
+
+    // Content
     Content,
     ContentMustacheStart,
     ContentMustacheEnd,
     ContentMustache,
+
+    // Other
     Whitespace,
     Unknown,
     EOS,

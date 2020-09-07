@@ -65,11 +65,13 @@ export interface ContentMustache extends NodeCommon {
 }
 
 export interface Script extends NodeCommon {
-    root: any;
+    ast: any;
+    text: string;
 }
 
 export interface Style extends NodeCommon {
-    root: any;
+    ast: any;
+    text: string;
 }
 
 export interface Attribute extends NodeCommon {

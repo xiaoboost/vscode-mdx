@@ -18,6 +18,8 @@ export const code = {
     DQO: '"'.charCodeAt(0),
     /** 单引号 */
     SQO: '\''.charCodeAt(0),
+    /** 开单引号 */
+    OSQ: '`'.charCodeAt(0),
     /** 换行符 */
     NWL: '\n'.charCodeAt(0),
     /** 软空格 */
@@ -50,3 +52,20 @@ export const errorText = {
 export function isWhiteSpace(ch: number) {
     return ch === code.WSP || ch === code.TAB || ch === code.NWL || ch === code.LFD || ch === code.CAR;
 }
+
+/** 字符串转换为编码数组 */
+export function toCodes(str: string) {
+    const codes: number[] = [];
+
+    for (let i = 0; i < str.length - 1; i++) {
+        codes.push(str.charCodeAt(i));
+    }
+
+    return codes;
+}
+
+/** script 标签字符串编码 */
+export const scriptEndTagCodes = toCodes('</script>');
+
+/** style 标签字符串编码 */
+export const styleEndTagCodes = toCodes('</style>');

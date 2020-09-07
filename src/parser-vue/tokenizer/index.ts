@@ -1,13 +1,13 @@
-import { TokenType, ScannerState } from './types';
 import { CodePointer } from './pointer';
-import { code, errorText } from './constant';
+import { TokenKind, ScannerState } from './types';
+import { code, errorText, scriptEndTagCodes, styleEndTagCodes } from './constant';
 
 export * from './types';
 
 /** Token 标记扫描器 */
 export class Scanner {
     private _pointer: CodePointer;
-    private _tokenType = TokenType.Unknown;
+    private _TokenKind = TokenKind.Unknown;
     private _tokenStart = 0;
     private _tokenError?: string;
     private _state = ScannerState.WithinContent;
@@ -30,8 +30,8 @@ export class Scanner {
         this._state = val;
     }
 
-    get tokenType() {
-        return this._tokenType;
+    get TokenKind() {
+        return this._TokenKind;
     }
 
     get tokenStart() {
@@ -62,62 +62,20 @@ export class Scanner {
         return this._pointer.advanceIfRegExp(/^[:@]?[^\s"':.></=\x00-\x0F\x7F\x80-\x9F]*/);
     }
 
-    private finishToken(startOffset: number, type: TokenType, errorMessage?: string) {
-        this._tokenType = type;
+    private finishToken(startOffset: number, type: TokenKind, errorMessage?: string) {
+        this._TokenKind = type;
         this._tokenStart = startOffset;
         this._tokenError = errorMessage;
 
         return type;
     }
 
-    private scanCodeContent(tagName: 'Script' | 'Style') {
-        const { _pointer: pointer } = this;
-        const matcher = new RegExp(`\\/\\*|\\/\\/|'|"|\`|<\\/${tagName.toLowerCase()}\\s*\\/?>?`, 'i');
-
-        while (!pointer.eos) {
-            const match = pointer.advanceIfRegExp(matcher);
-
-            // 未匹配到结束标志，扫描结束
-            if (match.length === 0) {
-                pointer.goToEnd();
-                return this.finishToken(this.tokenStart, TokenType[tagName]);
-            }
-            else if (match === '/*') {
-                // ..
-            }
-            else if (match === '//') {
-                // ..
-            }
-            else if (match === '\'') {
-                // ..
-            }
-            else if (match === '"') {
-                // ..
-            }
-            else if (match === '`') {
-                // ..
-            }
-            // 结束标签
-            else {
-                // ..
-            }
-        }
-
-        this._state = ScannerState.WithinContent;
-
-        if (this.tokenStart < pointer.pos) {
-            return this.finishToken(this.tokenStart, TokenType.Script);
-        }
-
-        return this.scan();
-    }
-
     /** 扫描下一个标记 */
-    scan(): TokenType {
+    scan(): TokenKind {
         const { _pointer: pointer } = this;
 
         if (pointer.eos) {
-            return this.finishToken(pointer.pos, TokenType.EOS);
+            return this.finishToken(pointer.pos, TokenKind.EOS);
         }
 
         let errorMessage = '';
@@ -128,12 +86,12 @@ export class Scanner {
                 // '-->'
                 if (pointer.advanceIfChars([code.MIN, code.MIN, code.RAN])) {
                     this.state = ScannerState.WithinContent;
-                    return this.finishToken(startOffset, TokenType.EndCommentTag);
+                    return this.finishToken(startOffset, TokenKind.EndCommentTag);
                 }
 
                 // '-->'
                 pointer.advanceUntilChars([code.MIN, code.MIN, code.RAN]);
-                return this.finishToken(startOffset, TokenType.Comment);
+                return this.finishToken(startOffset, TokenKind.Comment);
             }
             case ScannerState.WithinContent: {
                 // '<'
@@ -143,28 +101,28 @@ export class Scanner {
                         // '<!--'
                         if (pointer.advanceIfChars([code.BNG, code.MIN, code.MIN])) {
                             this.state = ScannerState.WithinComment;
-                            return this.finishToken(startOffset, TokenType.StartCommentTag);
+                            return this.finishToken(startOffset, TokenKind.StartCommentTag);
                         }
                     }
 
                     // '/'
                     if (pointer.advanceIfChar(code.FSL)) {
                         this.state = ScannerState.AfterOpeningEndTag;
-                        return this.finishToken(startOffset, TokenType.EndTagOpen);
+                        return this.finishToken(startOffset, TokenKind.EndTagOpen);
                     }
 
                     this.state = ScannerState.AfterOpeningStartTag;
-                    return this.finishToken(startOffset, TokenType.StartTagOpen);
+                    return this.finishToken(startOffset, TokenKind.StartTagOpen);
                 }
                 // '{{'
                 else if (pointer.advanceIfChars([code.LBR, code.LBR])) {
                     this.state = ScannerState.WithinMustache;
-                    return this.finishToken(startOffset, TokenType.ContentMustacheStart);
+                    return this.finishToken(startOffset, TokenKind.ContentMustacheStart);
                 }
                 // 纯文本，直到 '{{' 或者 '<'
                 else {
                     pointer.advanceUntilRegExp(/({{|<)/);
-                    return this.finishToken(startOffset, TokenType.Content);
+                    return this.finishToken(startOffset, TokenKind.Content);
                 }
             }
             case ScannerState.AfterOpeningEndTag: {
@@ -172,19 +130,19 @@ export class Scanner {
 
                 if (tagName.length > 0) {
                     this.state = ScannerState.WithinEndTag;
-                    return this.finishToken(startOffset, TokenType.EndTag);
+                    return this.finishToken(startOffset, TokenKind.EndTag);
                 }
 
                 // 非法空格
                 if (pointer.skipWhitespace()) {
-                    return this.finishToken(startOffset, TokenType.Whitespace, errorText.unexpectedWhitespace);
+                    return this.finishToken(startOffset, TokenKind.Whitespace, errorText.unexpectedWhitespace);
                 }
 
                 this.state = ScannerState.WithinEndTag;
                 pointer.advanceUntilChar(code.RAN);
 
                 if (startOffset < pointer.pos) {
-                    return this.finishToken(startOffset, TokenType.Unknown, errorText.endTagNameExpected);
+                    return this.finishToken(startOffset, TokenKind.Unknown, errorText.endTagNameExpected);
                 }
 
                 return this.scan();
@@ -192,19 +150,19 @@ export class Scanner {
             case ScannerState.WithinEndTag: {
                 // 非法空格
                 if (pointer.skipWhitespace()) {
-                    return this.finishToken(startOffset, TokenType.Whitespace);
+                    return this.finishToken(startOffset, TokenKind.Whitespace);
                 }
 
                 // '>'
                 if (pointer.advanceIfChar(code.RAN)) {
                     this.state = ScannerState.WithinContent;
-                    return this.finishToken(startOffset, TokenType.EndTagClose);
+                    return this.finishToken(startOffset, TokenKind.EndTagClose);
                 }
 
                 // '<'
                 if (pointer.peekChar() === code.LAN) {
                     this.state = ScannerState.WithinContent;
-                    return this.finishToken(startOffset, TokenType.EndTagClose, errorText.closingBracketMissing);
+                    return this.finishToken(startOffset, TokenKind.EndTagClose, errorText.closingBracketMissing);
                 }
 
                 errorMessage = errorText.closingBracketExpected;
@@ -217,25 +175,25 @@ export class Scanner {
                 if (this._lastTag.length > 0) {
                     this._hasSpaceAfterTag = false;
                     this.state = ScannerState.WithinTag;
-                    return this.finishToken(startOffset, TokenType.StartTag);
+                    return this.finishToken(startOffset, TokenKind.StartTag);
                 }
 
                 // 非法空白
                 if (pointer.skipWhitespace()) {
-                    return this.finishToken(startOffset, TokenType.Whitespace, errorText.unexpectedWhitespace);
+                    return this.finishToken(startOffset, TokenKind.Whitespace, errorText.unexpectedWhitespace);
                 }
 
                 // 结束标签
                 if (pointer.advanceIfChars([code.LAN, code.FSL])) {
                     this.state = ScannerState.AfterOpeningEndTag;
-                    return this.finishToken(startOffset, TokenType.EndTagOpen);
+                    return this.finishToken(startOffset, TokenKind.EndTagOpen);
                 }
 
                 this.state = ScannerState.WithinTag;
                 pointer.advanceUntilChar(code.RAN);
 
                 if (startOffset < pointer.pos) {
-                    return this.finishToken(startOffset, TokenType.Unknown, errorText.startTagNameExpected);
+                    return this.finishToken(startOffset, TokenKind.Unknown, errorText.startTagNameExpected);
                 }
 
                 return this.scan();
@@ -244,7 +202,7 @@ export class Scanner {
                 // 跳过空白
                 if (pointer.skipWhitespace()) {
                     this._hasSpaceAfterTag = true;
-                    return this.finishToken(startOffset, TokenType.Whitespace);
+                    return this.finishToken(startOffset, TokenKind.Whitespace);
                 }
 
                 // 确实跳过了空白，接下来才允许是属性名称
@@ -255,49 +213,51 @@ export class Scanner {
                         this._hasSpaceAfterTag = false;
                         this.state = ScannerState.AfterAttributeName;
 
-                        return this.finishToken(startOffset, TokenType.AttributeName);
+                        return this.finishToken(startOffset, TokenKind.AttributeName);
                     }
                 }
 
                 // '/>'
                 if (pointer.advanceIfChars([code.FSL, code.RAN])) {
                     this.state = ScannerState.WithinContent;
-                    return this.finishToken(startOffset, TokenType.StartTagSelfClose);
+                    return this.finishToken(startOffset, TokenKind.StartTagSelfClose);
                 }
 
                 // '>'
                 if (pointer.advanceIfChar(code.RAN)) {
-                    if (this._lastTag === 'script') {
+                    const tagName = this._lastTag.toLowerCase();
+
+                    if (tagName === 'script') {
                         this.state = ScannerState.WithinScriptContent;
                     }
-                    else if (this._lastTag === 'style') {
+                    else if (tagName === 'style') {
                         this.state = ScannerState.WithinStyleContent;
                     }
                     else {
                         this.state = ScannerState.WithinContent;
                     }
 
-                    return this.finishToken(startOffset, TokenType.StartTagClose);
+                    return this.finishToken(startOffset, TokenKind.StartTagClose);
                 }
 
                 // '<'
                 if (pointer.peekChar() === code.LAN) {
                     this.state = ScannerState.WithinContent;
-                    return this.finishToken(startOffset, TokenType.StartTagClose, errorText.closingBracketMissing);
+                    return this.finishToken(startOffset, TokenKind.StartTagClose, errorText.closingBracketMissing);
                 }
 
                 pointer.advance(1);
-                return this.finishToken(startOffset, TokenType.Unknown, errorText.unexpectedCharacterInTag);
+                return this.finishToken(startOffset, TokenKind.Unknown, errorText.unexpectedCharacterInTag);
             }
             case ScannerState.WithinMustache: {
-                const isStart = this._tokenType === TokenType.ContentMustacheStart;
+                const isStart = this._TokenKind === TokenKind.ContentMustacheStart;
 
                 // '}}'
                 if (pointer.advanceIfChars([code.RBR, code.RBR])) {
                     this.state = this._lastState;
 
                     const err = isStart ? errorText.mustacheCannotBeEmpty : undefined;
-                    const endType = TokenType.ContentMustacheEnd;
+                    const endType = TokenKind.ContentMustacheEnd;
 
                     return this.finishToken(startOffset, endType, err);
                 }
@@ -306,19 +266,19 @@ export class Scanner {
                     const result = pointer.advanceUntilChars([code.RBR, code.RBR]);
                     const err = result ? undefined : errorText.mustacheEndExpected;
 
-                    return this.finishToken(startOffset, TokenType.ContentMustache, err);
+                    return this.finishToken(startOffset, TokenKind.ContentMustache, err);
                 }
             }
             case ScannerState.AfterAttributeName: {
                 // 跳过空白
                 if (pointer.skipWhitespace()) {
                     this._hasSpaceAfterTag = true;
-                    return this.finishToken(startOffset, TokenType.Whitespace);
+                    return this.finishToken(startOffset, TokenKind.Whitespace);
                 }
 
                 if (pointer.advanceIfChar(code.EQS)) {
                     this.state = ScannerState.BeforeAttributeValue;
-                    return this.finishToken(startOffset, TokenType.AttributeDelimiter);
+                    return this.finishToken(startOffset, TokenKind.AttributeDelimiter);
                 }
 
                 this.state = ScannerState.WithinTag;
@@ -327,7 +287,7 @@ export class Scanner {
             case ScannerState.BeforeAttributeValue: {
                 // 跳过空白
                 if (pointer.skipWhitespace()) {
-                    return this.finishToken(startOffset, TokenType.Whitespace);
+                    return this.finishToken(startOffset, TokenKind.Whitespace);
                 }
 
                 const ch = pointer.peekChar();
@@ -338,7 +298,7 @@ export class Scanner {
                 if (ch === code.SQO || ch === code.DQO) {
                     pointer.advance(1);
                     this._lastAttrMark = ch;
-                    return this.finishToken(startOffset, TokenType.AttributeMark);
+                    return this.finishToken(startOffset, TokenKind.AttributeMark);
                 }
 
                 this._lastAttrMark = null;
@@ -351,12 +311,12 @@ export class Scanner {
                 if (this._lastAttrMark) {
                     if (pointer.advanceIfChar(this._lastAttrMark)) {
                         this.state = ScannerState.WithinTag;
-                        return this.finishToken(startOffset, TokenType.AttributeMark);
+                        return this.finishToken(startOffset, TokenKind.AttributeMark);
                     }
                     else {
                         const markChar = String.fromCharCode(this._lastAttrMark);
                         pointer.advanceUntilRegExp(new RegExp(`({{|${markChar})`));
-                        return this.finishToken(startOffset, TokenType.AttributeValue);
+                        return this.finishToken(startOffset, TokenKind.AttributeValue);
                     }
                 }
                 else {
@@ -364,7 +324,7 @@ export class Scanner {
                     if (pointer.skipWhitespace()) {
                         this._hasSpaceAfterTag = true;
                         this.state = ScannerState.WithinTag;
-                        return this.finishToken(startOffset, TokenType.Whitespace);
+                        return this.finishToken(startOffset, TokenKind.Whitespace);
                     }
 
                     // '/'
@@ -374,7 +334,7 @@ export class Scanner {
                             pointer.goBack(1);
                             this._hasSpaceAfterTag = false;
                             this.state = ScannerState.WithinContent;
-                            return this.finishToken(startOffset, TokenType.StartTagClose);
+                            return this.finishToken(startOffset, TokenKind.StartTagClose);
                         }
                         else {
                             return this.scan();
@@ -384,25 +344,84 @@ export class Scanner {
                     // '>'
                     if (pointer.advanceIfChar(code.RAN)) {
                         this.state = ScannerState.WithinContent;
-                        return this.finishToken(startOffset, TokenType.StartTagClose);
+                        return this.finishToken(startOffset, TokenKind.StartTagClose);
                     }
 
                     // 纯文本，直到 /> > 以及所有空白字符
                     pointer.advanceUntilRegExp(/(\s|\/>|>)/);
-                    return this.finishToken(startOffset, TokenType.AttributeValue);
+                    return this.finishToken(startOffset, TokenKind.AttributeValue);
                 }
             }
+            case ScannerState.WithinStyleContent:
             case ScannerState.WithinScriptContent: {
-                return this.scanCodeContent('Script');
-            }
-            case ScannerState.WithinStyleContent: {
-                return this.scanCodeContent('Style');
+                const tagName = this._state === ScannerState.WithinStyleContent ? 'style' : 'script';
+                const closeTag = this._state === ScannerState.WithinStyleContent ? styleEndTagCodes : scriptEndTagCodes;
+                const tokenName = this._state === ScannerState.WithinStyleContent ? TokenKind.Style : TokenKind.Script;
+                const matcher = new RegExp(`\\/\\*|\\/\\/|'|"|\`|<\\/${tagName.toLowerCase()}\\s*\\/?>?`, 'i');
+                const advanceString = (code: number) => {
+                    // 下一个还是同样的符号
+                    if (pointer.advanceIfChar(code)) {
+                        return;
+                    }
+
+                    const char = String.fromCharCode(code);
+                    const matcher = new RegExp(`[^\\\\${char}]+?${char}`);
+
+                    return pointer.advanceIfRegExp(matcher);
+                };
+
+                while (!pointer.eos) {
+                    const result = pointer.advanceUntilRegExp(matcher);
+
+                    // 没有匹配到，跳出循环
+                    if (!result) {
+                        pointer.goToEnd();
+                        break;
+                    }
+
+                    // '
+                    if (pointer.advanceIfChar(code.SQO)) {
+                        advanceString(code.SQO);
+                    }
+                    // '"'
+                    else if (pointer.advanceIfChar(code.DQO)) {
+                        advanceString(code.DQO);
+                    }
+                    // '`'
+                    else if (pointer.advanceIfChar(code.OSQ)) {
+                        advanceString(code.OSQ);
+                    }
+                    // '/*'
+                    else if (pointer.advanceIfChars([code.FSL, code.STA])) {
+                        pointer.advanceUntilChars([code.STA, code.FSL], true);
+                    }
+                    // '//'
+                    else if (pointer.advanceIfChars([code.FSL, code.FSL])) {
+                        pointer.advanceUntilChar(code.NWL, true);
+                    }
+                    // '</script|style>'
+                    else if (pointer.peekSame(closeTag)) {
+                        break;
+                    }
+                    else {
+                        pointer.goToEnd();
+                        break;
+                    }
+                }
+
+                this._state = ScannerState.WithinContent;
+
+                if (startOffset < pointer.pos) {
+                    return this.finishToken(startOffset, tokenName);
+                }
+
+                return this.scan();
             }
         }
 
         pointer.advance(1);
         this.state = ScannerState.WithinContent;
 
-        return this.finishToken(pointer.pos, TokenType.Unknown, errorMessage);
+        return this.finishToken(pointer.pos, TokenKind.Unknown, errorMessage);
     }
 }

@@ -1,4 +1,4 @@
-import { TokenType, Scanner } from '../tokenizer';
+import { TokenKind, Scanner } from '../tokenizer';
 import { errorText } from './constant';
 
 import * as utils from './utils';
@@ -19,6 +19,8 @@ import {
     ParserError,
     ParserOptions,
     TextNode,
+    Script,
+    Style,
 } from './types';
 
 export * from './types';
@@ -38,7 +40,7 @@ class Parser {
     /** 当前节点 */
     private curNode: Node;
     /** 当前标志符 */
-    private token: TokenType;
+    private token: TokenKind;
     /** 当前标签 */
     private endTagName = '';
     /** 当前结束标签起点 */
@@ -288,9 +290,9 @@ class Parser {
     }
 
     parse() {
-        while (this.token !== TokenType.EOS) {
+        while (this.token !== TokenKind.EOS) {
             switch (this.token) {
-                case TokenType.StartCommentTag: {
+                case TokenKind.StartCommentTag: {
                     const comment: Comment = {
                         type: NodeType.Comment,
                         text: '',
@@ -309,18 +311,18 @@ class Parser {
                     this.curNode = comment;
                     break;
                 }
-                case TokenType.EndCommentTag: {
+                case TokenKind.EndCommentTag: {
                     const node = this.curNode as Comment;
 
                     node.range.end = this.positionAt(this.scanner.tokenEnd);
                     this.curNode = node.parent as Node;
                     break;
                 }
-                case TokenType.Comment: {
+                case TokenKind.Comment: {
                     (this.curNode as Comment).text = this.scanner.tokenText;
                     break;
                 }
-                case TokenType.Content: {
+                case TokenKind.Content: {
                     const start = this.scanner.tokenStart;
                     const end = this.scanner.tokenEnd;
 
@@ -339,7 +341,7 @@ class Parser {
 
                     break;
                 }
-                case TokenType.StartTagOpen: {
+                case TokenKind.StartTagOpen: {
                     const node: Element = {
                         type: NodeType.Element,
                         range: {
@@ -360,7 +362,7 @@ class Parser {
                     this.curNode = node;
                     break;
                 }
-                case TokenType.StartTagClose: {
+                case TokenKind.StartTagClose: {
                     let node = this.curNode as Element | Attribute;
 
                     if (node.type === NodeType.Attribute) {
@@ -372,7 +374,7 @@ class Parser {
                     this.curNode = node;
                     break;
                 }
-                case TokenType.StartTagSelfClose: {
+                case TokenKind.StartTagSelfClose: {
                     if (this.curNode.type === NodeType.Attribute) {
                         this.curNode = this.curNode.parent as Node;
                     }
@@ -389,28 +391,28 @@ class Parser {
 
                     break;
                 }
-                case TokenType.StartTag: {
+                case TokenKind.StartTag: {
                     (this.curNode as Element).tag = this.scanner.tokenText.toLowerCase();
                     break;
                 }
-                case TokenType.EndTagOpen: {
+                case TokenKind.EndTagOpen: {
                     this.endTagName = '';
                     this.endTagStart = this.positionAt(this.scanner.tokenStart);
                     break;
                 }
-                case TokenType.EndTagClose: {
+                case TokenKind.EndTagClose: {
                     this.closeNode();
                     break;
                 }
-                case TokenType.EndTag: {
+                case TokenKind.EndTag: {
                     this.endTagName = this.scanner.tokenText.toLowerCase();
                     break;
                 }
-                case TokenType.AttributeName: {
+                case TokenKind.AttributeName: {
                     this.addAttr();
                     break;
                 }
-                case TokenType.AttributeValue: {
+                case TokenKind.AttributeValue: {
                     const attr = this.curNode as Attribute;
 
                     attr.value = this.scanner.tokenText;
@@ -419,11 +421,11 @@ class Parser {
 
                     break;
                 }
-                case TokenType.AttributeMark: {
+                case TokenKind.AttributeMark: {
                     (this.curNode as Attribute).range.end = this.positionAt(this.scanner.tokenEnd);
                     break;
                 }
-                case TokenType.ContentMustacheStart: {
+                case TokenKind.ContentMustacheStart: {
                     const attr = this.curNode as Attribute;
 
                     if (!attr.children) {
@@ -445,27 +447,29 @@ class Parser {
 
                     break;
                 }
-                case TokenType.ContentMustacheEnd: {
+                case TokenKind.ContentMustacheEnd: {
                     this.curNode.range.end = this.positionAt(this.scanner.tokenEnd);
                     this.curNode = this.curNode.parent as Node;
                     break;
                 }
-                case TokenType.ContentMustache: {
+                case TokenKind.ContentMustache: {
                     (this.curNode as ContentMustache).text = this.scanner.tokenText;
                     break;
                 }
-                case TokenType.Script: {
-                    // TODO:
+                // TODO:
+                case TokenKind.Script: {
+                    (this.curNode as Script).text = this.scanner.tokenText;
                     break;
                 }
-                case TokenType.Style: {
-                    // TODO:
+                // TODO:
+                case TokenKind.Style: {
+                    (this.curNode as Style).text = this.scanner.tokenText;
                     break;
                 }
-                case TokenType.Whitespace: {
+                case TokenKind.Whitespace: {
                     break;
                 }
-                case TokenType.Unknown: {
+                case TokenKind.Unknown: {
                     this.errors.push({
                         message: this.scanner.tokenError ?? '',
                         range: this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd),
@@ -475,7 +479,7 @@ class Parser {
                 }
             }
 
-            if (this.scanner.tokenError && this.scanner.tokenType !== TokenType.Unknown) {
+            if (this.scanner.tokenError && this.scanner.TokenKind !== TokenKind.Unknown) {
                 this.errors.push({
                     message: this.scanner.tokenError,
                     range: this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd),
