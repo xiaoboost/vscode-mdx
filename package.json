@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "clear": "rimraf ./dist",
-    "watch": "tsc -p ./tsconfig.build.json --module CommonJS -w",
+    "watch": "pnpm run clear && tsc -p ./tsconfig.watch.json --module CommonJS -w",
     "dev": "pnpm run clear && ts-node-transpile-only --project ./tsconfig.compile.json ./build/webpack.ts --development",
     "build": "pnpm run clear && ts-node-transpile-only --project ./tsconfig.compile.json ./build/webpack.ts --production",
     "build:analyze": "pnpm run clear && ts-node-transpile-only --project tsconfig.compile.json ./build/webpack.ts --production --analyze"

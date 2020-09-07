@@ -43,7 +43,7 @@ export const baseConfig: Webpack.Configuration = {
         mainFiles: ['index.ts', 'index.js'],
         plugins: [
             new TsconfigPathsPlugin({
-                configFile: resolve('tsconfig.build.json'),
+                configFile: resolve('tsconfig.webpack.json'),
             }),
         ],
     },
@@ -59,7 +59,7 @@ export const baseConfig: Webpack.Configuration = {
                 exclude: /node_modules/,
                 loader: 'ts-loader',
                 options: {
-                    configFile: resolve('tsconfig.build.json'),
+                    configFile: resolve('tsconfig.webpack.json'),
                 },
             },
         ],
