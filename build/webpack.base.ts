@@ -5,6 +5,7 @@ import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin';
 import GenerateJsonPlugin from 'generate-json-webpack-plugin';
 import ProgressBarPlugin from 'progress-bar-webpack-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 import PackageConfig from '../package.json';
 
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
@@ -65,7 +66,6 @@ export const baseConfig: Webpack.Configuration = {
         ],
     },
     plugins: [
-        new Webpack.optimize.ModuleConcatenationPlugin(),
         new Webpack.HashedModuleIdsPlugin({
             hashFunction: 'sha256',
             hashDigest: 'hex',
@@ -80,6 +80,15 @@ export const baseConfig: Webpack.Configuration = {
             description: PackageConfig.description,
             main: PackageConfig.main,
             author: PackageConfig.author,
+            contributes: PackageConfig.contributes,
+        }),
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: resolve('src/language-syntax'),
+                    to: 'syntax',
+                },
+            ],
         }),
         new ProgressBarPlugin({
             total: 40,
@@ -104,6 +113,7 @@ if (isDevelopment) {
 else {
     baseConfig.optimization = {
         minimize: true,
+        concatenateModules: true,
         splitChunks: {
             maxInitialRequests: Infinity,
             minSize: 0,

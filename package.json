@@ -15,7 +15,7 @@
     "type": "git",
     "url": "https://github.com/xiaoboost/vscode-extension-vue"
   },
-  "main": "./dist/js/client.js",
+  "main": "./scripts/client.js",
   "activationEvents": [
     "onLanguage:vue"
   ],
@@ -23,7 +23,7 @@
     "languages": [
       {
         "id": "vue",
-        "configuration": "./syntax/vue-language-configuration.json",
+        "configuration": "./syntax/vue-configuration.json",
         "aliases": [
           "Vue",
           "vue"
@@ -31,26 +31,6 @@
         "extensions": [
           ".vue"
         ]
-      }
-    ],
-    "grammars": [
-      {
-        "language": "vue",
-        "scopeName": "source.vue",
-        "path": "./syntaxes/vue.tmLanguage.json",
-        "embeddedLanguages": {
-          "text.html": "html",
-          "text.markdown": "md",
-          "source.css": "css",
-          "source.scss": "scss",
-          "source.less": "less",
-          "source.sass": "sass",
-          "source.stylus": "stylus",
-          "source.js": "javascript",
-          "source.ts": "typescript",
-          "source.yaml": "yaml",
-          "source.json": "json"
-        }
       }
     ]
   },
