@@ -1,8 +1,23 @@
-import { files, lsp } from './utils';
+import { files, lsp } from './utils/store';
 
-// 语言服务监听文档控制器
-files.listen(lsp);
+import * as workspaces from './utils/workspace';
 
-files.onDidChangeContent(() => {
-    // ..
+lsp.onInitialize(() => {
+    return {
+        capabilities: {
+            colorProvider: true,
+            workspace: {
+                workspaceFolders: {
+                    supported: true,
+                },
+            },
+        },
+    };
+});
+
+lsp.onInitialized(() => {
+    lsp.workspace.onDidChangeWorkspaceFolders((event) => {
+        event.added.forEach(workspaces.add);
+        event.removed.forEach(workspaces.remove);
+    });
 });

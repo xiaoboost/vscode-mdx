@@ -81,6 +81,8 @@ export const baseConfig: Webpack.Configuration = {
             main: PackageConfig.main,
             author: PackageConfig.author,
             contributes: PackageConfig.contributes,
+            engines: PackageConfig.engines,
+            activationEvents: PackageConfig.activationEvents,
         }),
         new CopyWebpackPlugin({
             patterns: [
