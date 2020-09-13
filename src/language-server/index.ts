@@ -1,23 +1,24 @@
-import { files, lsp } from './utils/store';
+import { lsp } from './utils/store';
+import { uriToFsPath } from './utils/path';
 
-import * as workspaces from './utils/workspace';
+import * as workspaces from './workspace';
+import * as validator from './validator';
 
-lsp.onInitialize(() => {
+lsp.onInitialize((params) => {
+    // 工作区初始化
+    (params.workspaceFolders ?? []).forEach(({ uri }) => {
+        workspaces.add(uriToFsPath(uri));
+    });
+
     return {
         capabilities: {
-            colorProvider: true,
-            workspace: {
-                workspaceFolders: {
-                    supported: true,
-                },
-            },
+            ...workspaces.capabilities,
+            ...validator.capabilities,
         },
     };
 });
 
 lsp.onInitialized(() => {
-    lsp.workspace.onDidChangeWorkspaceFolders((event) => {
-        event.added.forEach(workspaces.add);
-        event.removed.forEach(workspaces.remove);
-    });
+    workspaces.install();
+    validator.install();
 });
