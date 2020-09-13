@@ -19,6 +19,7 @@ import {
     externalModules,
     isDevelopment,
     isAnalyzer,
+    copyObject,
 } from './utils';
 
 /** 公共配置 */
@@ -74,16 +75,18 @@ export const baseConfig: Webpack.Configuration = {
         new Webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(modeName),
         }),
-        new GenerateJsonPlugin('package.json', {
-            name: PackageConfig.name,
-            version: PackageConfig.version,
-            description: PackageConfig.description,
-            main: PackageConfig.main,
-            author: PackageConfig.author,
-            contributes: PackageConfig.contributes,
-            engines: PackageConfig.engines,
-            activationEvents: PackageConfig.activationEvents,
-        }),
+        new GenerateJsonPlugin('package.json', copyObject(PackageConfig, [
+            'name',
+            'version',
+            'description',
+            'main',
+            'author',
+            'contributes',
+            'engines',
+            'keywords',
+            'publisher',
+            'activationEvents',
+        ])),
         new CopyWebpackPlugin({
             patterns: [
                 {

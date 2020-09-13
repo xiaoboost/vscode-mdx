@@ -10,12 +10,18 @@
     "build:analyze": "pnpm run clear && ts-node-transpile-only --project tsconfig.compile.json ./build/webpack.ts --production --analyze"
   },
   "author": "xiaoboost",
+  "publisher": "xiaoboost",
   "license": "ISC",
   "repository": {
     "type": "git",
     "url": "https://github.com/xiaoboost/vscode-extension-vue"
   },
   "main": "./scripts/client.js",
+  "keywords": [
+    "vue",
+    "vscode-extension",
+    "language-server"
+  ],
   "engines": {
     "vscode": "^1.20.0"
   },

@@ -67,3 +67,16 @@ export const externalModules = (() => {
 
     return packages.filter((item): item is string => Boolean(item));
 })();
+
+/** 按照 key 复制对象 */
+export function copyObject<T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
+    const result: Pick<T, K> = {} as any;
+  
+    keys.forEach(key => {
+        if (obj[key]) {
+            result[key] = obj[key];
+        }
+    });
+  
+    return result;
+}
