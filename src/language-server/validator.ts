@@ -20,12 +20,12 @@ import * as files from './utils/file-map';
 function toRange(input: VueRange): VSCRange {
     return {
         start: {
-            line: input.start.line ?? 0,
-            character: input.start.col ?? 0,
+            line: (input.start.line ?? 0) - 1,
+            character: (input.start.col ?? 0) - 1,
         },
         end: {
-            line: input.end.line ?? 0,
-            character: input.end.col ?? 0,
+            line: (input.end.line ?? 0) - 1,
+            character: (input.end.col ?? 0) - 1,
         },
     };
 }
