@@ -79,6 +79,15 @@ export class CodePointer {
         return false;
     }
 
+    advanceIfOrChar(chs: number[]) {
+        if (chs.some((ch) => ch === this.source.charCodeAt(this._offset))) {
+            this._offset++;
+            return true;
+        }
+
+        return false;
+    }
+
     advanceIfChars(ch: number[]) {
         let i: number;
 

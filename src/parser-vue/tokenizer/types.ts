@@ -19,11 +19,15 @@ export enum TokenKind {
 
     // Attributes
     AttributeName,
-    AttributeArgument,
-    AttributeModifier,
     AttributeDelimiter,
     AttributeMark,
     AttributeValue,
+
+    // Command
+    CommandColon,
+    CommandName,
+    CommandArgument,
+    CommandModifier,
 
     // Content
     Content,
@@ -50,6 +54,8 @@ export enum ScannerState {
     WithinEndTag,
     /** 注释内 */
     WithinComment,
+    /** 指令内 */
+    WithinCommand,
     /** script 标签内 */
     WithinScriptContent,
     /** style 标签内 */

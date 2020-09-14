@@ -205,6 +205,18 @@ export class Scanner {
                     return this.finishToken(startOffset, TokenKind.Whitespace);
                 }
 
+                // '@' or ':'
+                if (pointer.advanceIfOrChar([code.AT, code.COL])) {
+                    this.state = ScannerState.WithinCommand;
+                    return this.finishToken(startOffset, TokenKind.CommandName);
+                }
+
+                // v-
+                if (pointer.advanceIfChars([code.VChar, code.MIN])) {
+                    pointer.advanceIfRegExp(/^[^\s"':></=\x00-\x0F\x7F\x80-\x9F]*/);
+                    return this.finishToken(startOffset, TokenKind.CommandName);
+                }
+
                 // 确实跳过了空白，接下来才允许是属性名称
                 if (this._hasSpaceAfterTag) {
                     this._lastAttributeName = this.nextAttributeName();

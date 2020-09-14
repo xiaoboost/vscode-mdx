@@ -34,6 +34,12 @@ export const code = {
     LBR: '{'.charCodeAt(0),
     /** 右花括号 */
     RBR: '}'.charCodeAt(0),
+    /** @ 符号 */
+    AT: '@'.charCodeAt(0),
+    /** 冒号 */
+    COL: ':'.charCodeAt(0),
+    /** 字母 V */
+    VChar: 'v'.charCodeAt(0),
 };
 
 /** 错误文本 */
