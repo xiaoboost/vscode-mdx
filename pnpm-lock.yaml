@@ -11,13 +11,13 @@ devDependencies:
   '@types/friendly-errors-webpack-plugin': 0.1.2
   '@types/generate-json-webpack-plugin': 0.3.1
   '@types/line-column': 1.0.0
-  '@types/node': 14.10.1
+  '@types/node': 14.10.2
   '@types/progress-bar-webpack-plugin': 2.1.0
-  '@types/terser-webpack-plugin': 4.1.0
+  '@types/terser-webpack-plugin': 4.2.0
   '@types/vscode': 1.49.0
   '@types/webpack-bundle-analyzer': 3.8.0
-  '@typescript-eslint/eslint-plugin': 4.1.0_d70aa5b3e719c436015e25e652016497
-  '@typescript-eslint/parser': 4.1.0_eslint@7.9.0+typescript@4.0.2
+  '@typescript-eslint/eslint-plugin': 4.1.1_f56e3c8176f99a28c3d29ed46b5a0108
+  '@typescript-eslint/parser': 4.1.1_eslint@7.9.0+typescript@4.0.2
   chalk: 4.1.0
   copy-webpack-plugin: 6.1.0_webpack@4.44.1
   eslint: 7.9.0
@@ -26,7 +26,7 @@ devDependencies:
   progress-bar-webpack-plugin: 2.1.0_webpack@4.44.1
   require-split-chunk-webpack-plugin: 1.0.1
   rimraf: 3.0.2
-  terser-webpack-plugin: 4.2.0_webpack@4.44.1
+  terser-webpack-plugin: 4.2.1_webpack@4.44.1
   ts-loader: 8.0.3_typescript@4.0.2
   ts-node: 9.0.0_typescript@4.0.2
   tsconfig-paths-webpack-plugin: 3.3.0
@@ -163,6 +163,11 @@ packages:
     resolution:
       integrity: sha1-zDI7rY6KUz1IIvRc5OUybzbkIXc=
       tarball: '@types/node/download/@types/node-14.10.1.tgz?cache=0&sync_timestamp=1599847747029&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fnode%2Fdownload%2F%40types%2Fnode-14.10.1.tgz'
+  /@types/node/14.10.2:
+    dev: true
+    resolution:
+      integrity: sha1-m0eiyOTavU23O1fnULJK9olgBRQ=
+      tarball: '@types/node/download/@types/node-14.10.2.tgz?cache=0&sync_timestamp=1600235100962&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fnode%2Fdownload%2F%40types%2Fnode-14.10.2.tgz'
   /@types/node/14.6.2:
     dev: true
     resolution:
@@ -193,14 +198,14 @@ packages:
     resolution:
       integrity: sha1-qcpLcKGLJwzLK8Cqr+/R1Ia36nQ=
       tarball: '@types/tapable/download/@types/tapable-1.0.6.tgz'
-  /@types/terser-webpack-plugin/4.1.0:
+  /@types/terser-webpack-plugin/4.2.0:
     dependencies:
       '@types/webpack': 4.41.21
       terser: 4.8.0
     dev: true
     resolution:
-      integrity: sha1-wcGVoZ0YUBU9Xto+AbKd8HAdCXk=
-      tarball: '@types/terser-webpack-plugin/download/@types/terser-webpack-plugin-4.1.0.tgz'
+      integrity: sha1-/jmRfTNCh8XPJavPNwhnox7VnNY=
+      tarball: '@types/terser-webpack-plugin/download/@types/terser-webpack-plugin-4.2.0.tgz'
   /@types/uglify-js/3.9.3:
     dependencies:
       source-map: 0.6.1
@@ -222,7 +227,7 @@ packages:
       tarball: '@types/webpack-bundle-analyzer/download/@types/webpack-bundle-analyzer-3.8.0.tgz'
   /@types/webpack-sources/1.4.2:
     dependencies:
-      '@types/node': 14.6.2
+      '@types/node': 14.10.1
       '@types/source-list-map': 0.1.2
       source-map: 0.7.3
     dev: true
@@ -232,7 +237,7 @@ packages:
   /@types/webpack/4.41.21:
     dependencies:
       '@types/anymatch': 1.3.1
-      '@types/node': 14.6.2
+      '@types/node': 14.10.1
       '@types/tapable': 1.0.6
       '@types/uglify-js': 3.9.3
       '@types/webpack-sources': 1.4.2
@@ -240,18 +245,19 @@ packages:
     dev: true
     resolution:
       integrity: sha1-zGhbMywz8VO7L1/B+jrIretZLe4=
-      tarball: '@types/webpack/download/@types/webpack-4.41.21.tgz'
-  /@typescript-eslint/eslint-plugin/4.1.0_d70aa5b3e719c436015e25e652016497:
+      tarball: '@types/webpack/download/@types/webpack-4.41.21.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fwebpack%2Fdownload%2F%40types%2Fwebpack-4.41.21.tgz'
+  /@typescript-eslint/eslint-plugin/4.1.1_f56e3c8176f99a28c3d29ed46b5a0108:
     dependencies:
-      '@typescript-eslint/experimental-utils': 4.1.0_eslint@7.9.0+typescript@4.0.2
-      '@typescript-eslint/parser': 4.1.0_eslint@7.9.0+typescript@4.0.2
-      '@typescript-eslint/scope-manager': 4.1.0
+      '@typescript-eslint/experimental-utils': 4.1.1_eslint@7.9.0+typescript@4.0.2
+      '@typescript-eslint/parser': 4.1.1_eslint@7.9.0+typescript@4.0.2
+      '@typescript-eslint/scope-manager': 4.1.1
       debug: 4.1.1
       eslint: 7.9.0
       functional-red-black-tree: 1.0.1
       regexpp: 3.1.0
       semver: 7.3.2
       tsutils: 3.17.1_typescript@4.0.2
+      typescript: 4.0.2
     dev: true
     engines:
       node: ^10.12.0 || >=12.0.0
@@ -259,15 +265,18 @@ packages:
       '@typescript-eslint/parser': ^4.0.0
       eslint: ^5.0.0 || ^6.0.0 || ^7.0.0
       typescript: '*'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
     resolution:
-      integrity: sha1-fTCfYIFf816WJ62F5Bko17f9RD8=
-      tarball: '@typescript-eslint/eslint-plugin/download/@typescript-eslint/eslint-plugin-4.1.0.tgz'
-  /@typescript-eslint/experimental-utils/4.1.0_eslint@7.9.0+typescript@4.0.2:
+      integrity: sha1-eNWxjiWbE8L07EHdkQWvJpoWGnU=
+      tarball: '@typescript-eslint/eslint-plugin/download/@typescript-eslint/eslint-plugin-4.1.1.tgz'
+  /@typescript-eslint/experimental-utils/4.1.1_eslint@7.9.0+typescript@4.0.2:
     dependencies:
       '@types/json-schema': 7.0.5
-      '@typescript-eslint/scope-manager': 4.1.0
-      '@typescript-eslint/types': 4.1.0
-      '@typescript-eslint/typescript-estree': 4.1.0_typescript@4.0.2
+      '@typescript-eslint/scope-manager': 4.1.1
+      '@typescript-eslint/types': 4.1.1
+      '@typescript-eslint/typescript-estree': 4.1.1_typescript@4.0.2
       eslint: 7.9.0
       eslint-scope: 5.1.0
       eslint-utils: 2.1.0
@@ -278,69 +287,77 @@ packages:
       eslint: '*'
       typescript: '*'
     resolution:
-      integrity: sha1-Jj1yJWRcCaQRyHNe7/1Bf1D0kCY=
-      tarball: '@typescript-eslint/experimental-utils/download/@typescript-eslint/experimental-utils-4.1.0.tgz'
-  /@typescript-eslint/parser/4.1.0_eslint@7.9.0+typescript@4.0.2:
+      integrity: sha1-Uv9ON8kxE+uWOFpObQdavs4epy0=
+      tarball: '@typescript-eslint/experimental-utils/download/@typescript-eslint/experimental-utils-4.1.1.tgz'
+  /@typescript-eslint/parser/4.1.1_eslint@7.9.0+typescript@4.0.2:
     dependencies:
-      '@typescript-eslint/scope-manager': 4.1.0
-      '@typescript-eslint/types': 4.1.0
-      '@typescript-eslint/typescript-estree': 4.1.0_typescript@4.0.2
+      '@typescript-eslint/scope-manager': 4.1.1
+      '@typescript-eslint/types': 4.1.1
+      '@typescript-eslint/typescript-estree': 4.1.1_typescript@4.0.2
       debug: 4.1.1
       eslint: 7.9.0
+      typescript: 4.0.2
     dev: true
     engines:
       node: ^10.12.0 || >=12.0.0
     peerDependencies:
       eslint: ^5.0.0 || ^6.0.0 || ^7.0.0
       typescript: '*'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
     resolution:
-      integrity: sha1-mwQJQRcl8UzX+qgaZk5QUSJZYds=
-      tarball: '@typescript-eslint/parser/download/@typescript-eslint/parser-4.1.0.tgz'
-  /@typescript-eslint/scope-manager/4.1.0:
+      integrity: sha1-MktLNeMUB1rbySvYMwzz7wyIzz4=
+      tarball: '@typescript-eslint/parser/download/@typescript-eslint/parser-4.1.1.tgz'
+  /@typescript-eslint/scope-manager/4.1.1:
     dependencies:
-      '@typescript-eslint/types': 4.1.0
-      '@typescript-eslint/visitor-keys': 4.1.0
+      '@typescript-eslint/types': 4.1.1
+      '@typescript-eslint/visitor-keys': 4.1.1
     dev: true
     engines:
       node: ^8.10.0 || ^10.13.0 || >=11.10.1
     resolution:
-      integrity: sha1-njiXRe6c/hIlLtHplYgIq9azpoM=
-      tarball: '@typescript-eslint/scope-manager/download/@typescript-eslint/scope-manager-4.1.0.tgz'
-  /@typescript-eslint/types/4.1.0:
+      integrity: sha1-vbhSboJDXzK0zNndTOwBr5e0iFA=
+      tarball: '@typescript-eslint/scope-manager/download/@typescript-eslint/scope-manager-4.1.1.tgz'
+  /@typescript-eslint/types/4.1.1:
     dev: true
     engines:
       node: ^8.10.0 || ^10.13.0 || >=11.10.1
     resolution:
-      integrity: sha1-7b0/7DRvNOE856oXawO0l6MsSWo=
-      tarball: '@typescript-eslint/types/download/@typescript-eslint/types-4.1.0.tgz'
-  /@typescript-eslint/typescript-estree/4.1.0_typescript@4.0.2:
+      integrity: sha1-V1AMSoayjLRwlMGmLxF36ieaCcs=
+      tarball: '@typescript-eslint/types/download/@typescript-eslint/types-4.1.1.tgz'
+  /@typescript-eslint/typescript-estree/4.1.1_typescript@4.0.2:
     dependencies:
-      '@typescript-eslint/types': 4.1.0
-      '@typescript-eslint/visitor-keys': 4.1.0
+      '@typescript-eslint/types': 4.1.1
+      '@typescript-eslint/visitor-keys': 4.1.1
       debug: 4.1.1
       globby: 11.0.1
       is-glob: 4.0.1
       lodash: 4.17.20
       semver: 7.3.2
       tsutils: 3.17.1_typescript@4.0.2
+      typescript: 4.0.2
     dev: true
     engines:
       node: ^10.12.0 || >=12.0.0
     peerDependencies:
       typescript: '*'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
     resolution:
-      integrity: sha1-OUBG6tJRZElCGMDj1rlgaV6pZ/Y=
-      tarball: '@typescript-eslint/typescript-estree/download/@typescript-eslint/typescript-estree-4.1.0.tgz'
-  /@typescript-eslint/visitor-keys/4.1.0:
+      integrity: sha1-IBWoTXEwPs229G79gHrBmlGqtJA=
+      tarball: '@typescript-eslint/typescript-estree/download/@typescript-eslint/typescript-estree-4.1.1.tgz'
+  /@typescript-eslint/visitor-keys/4.1.1:
     dependencies:
-      '@typescript-eslint/types': 4.1.0
+      '@typescript-eslint/types': 4.1.1
       eslint-visitor-keys: 2.0.0
     dev: true
     engines:
       node: ^8.10.0 || ^10.13.0 || >=11.10.1
     resolution:
-      integrity: sha1-stUoyUhOftoapPhszwQy+xbk1UU=
-      tarball: '@typescript-eslint/visitor-keys/download/@typescript-eslint/visitor-keys-4.1.0.tgz'
+      integrity: sha1-uwVmS/S+oo3BINHalPMCfUKrD28=
+      tarball: '@typescript-eslint/visitor-keys/download/@typescript-eslint/visitor-keys-4.1.1.tgz'
   /@webassemblyjs/ast/1.9.0:
     dependencies:
       '@webassemblyjs/helper-module-context': 1.9.0
@@ -1431,7 +1448,7 @@ packages:
     dev: true
     resolution:
       integrity: sha1-O3ImAlUQnGtYnO4FDx1RYTlmR5E=
-      tarball: debug/download/debug-4.1.1.tgz
+      tarball: debug/download/debug-4.1.1.tgz?cache=0&sync_timestamp=1589885560192&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fdebug%2Fdownload%2Fdebug-4.1.1.tgz
   /decode-uri-component/0.2.0:
     dev: true
     engines:
@@ -3744,7 +3761,7 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha1-IG0K0KVkjP+9uK5GQ489xRyfeOI=
-      tarball: regexpp/download/regexpp-3.1.0.tgz
+      tarball: regexpp/download/regexpp-3.1.0.tgz?cache=0&sync_timestamp=1586075683963&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fregexpp%2Fdownload%2Fregexpp-3.1.0.tgz
   /remove-trailing-separator/1.1.0:
     dev: true
     optional: true
@@ -3927,6 +3944,13 @@ packages:
     resolution:
       integrity: sha1-tSXhI4SJpez8Qq+sw/6Z5mb0sao=
       tarball: serialize-javascript/download/serialize-javascript-4.0.0.tgz
+  /serialize-javascript/5.0.1:
+    dependencies:
+      randombytes: 2.1.0
+    dev: true
+    resolution:
+      integrity: sha1-eIbshIBJpGJGepfT2Rjrsqr5NPQ=
+      tarball: serialize-javascript/download/serialize-javascript-5.0.1.tgz
   /serve-static/1.14.1:
     dependencies:
       encodeurl: 1.0.2
@@ -4337,14 +4361,14 @@ packages:
     resolution:
       integrity: sha1-oheu+uozDnNP+sthIOwfoxLWBAs=
       tarball: terser-webpack-plugin/download/terser-webpack-plugin-1.4.5.tgz
-  /terser-webpack-plugin/4.2.0_webpack@4.44.1:
+  /terser-webpack-plugin/4.2.1_webpack@4.44.1:
     dependencies:
       cacache: 15.0.5
       find-cache-dir: 3.3.1
       jest-worker: 26.3.0
       p-limit: 3.0.2
       schema-utils: 2.7.1
-      serialize-javascript: 4.0.0
+      serialize-javascript: 5.0.1
       source-map: 0.6.1
       terser: 5.3.1
       webpack: 4.44.1_webpack@4.44.1
@@ -4355,8 +4379,8 @@ packages:
     peerDependencies:
       webpack: ^4.0.0 || ^5.0.0
     resolution:
-      integrity: sha1-YkCnEQGlXGgj2E4RyP/zgLnf0m8=
-      tarball: terser-webpack-plugin/download/terser-webpack-plugin-4.2.0.tgz
+      integrity: sha1-RLiO9NdEMSn7E2potew+gNY+xHE=
+      tarball: terser-webpack-plugin/download/terser-webpack-plugin-4.2.1.tgz
   /terser/4.8.0:
     dependencies:
       commander: 2.20.3
@@ -4368,7 +4392,7 @@ packages:
     hasBin: true
     resolution:
       integrity: sha1-YwVjQ9fHC7KfOvZlhlpG/gOg3xc=
-      tarball: terser/download/terser-4.8.0.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fterser%2Fdownload%2Fterser-4.8.0.tgz
+      tarball: terser/download/terser-4.8.0.tgz
   /terser/5.3.1:
     dependencies:
       commander: 2.20.3
@@ -4926,13 +4950,13 @@ specifiers:
   '@types/friendly-errors-webpack-plugin': ^0.1.2
   '@types/generate-json-webpack-plugin': ^0.3.1
   '@types/line-column': ^1.0.0
-  '@types/node': ^14.10.1
+  '@types/node': ^14.10.2
   '@types/progress-bar-webpack-plugin': ^2.1.0
-  '@types/terser-webpack-plugin': ^4.1.0
+  '@types/terser-webpack-plugin': ^4.2.0
   '@types/vscode': ^1.49.0
   '@types/webpack-bundle-analyzer': ^3.8.0
-  '@typescript-eslint/eslint-plugin': ^4.1.0
-  '@typescript-eslint/parser': ^4.1.0
+  '@typescript-eslint/eslint-plugin': ^4.1.1
+  '@typescript-eslint/parser': ^4.1.1
   chalk: ^4.1.0
   copy-webpack-plugin: ^6.1.0
   eslint: ^7.9.0
@@ -4943,7 +4967,7 @@ specifiers:
   progress-bar-webpack-plugin: ^2.1.0
   require-split-chunk-webpack-plugin: ^1.0.1
   rimraf: ^3.0.2
-  terser-webpack-plugin: ^4.2.0
+  terser-webpack-plugin: ^4.2.1
   ts-loader: ^8.0.3
   ts-node: ^9.0.0
   tsconfig-paths-webpack-plugin: ^3.3.0

@@ -26,6 +26,7 @@ export enum TokenKind {
     // Command
     CommandColon,
     CommandName,
+    CommandShortName,
     CommandArgument,
     CommandModifier,
 

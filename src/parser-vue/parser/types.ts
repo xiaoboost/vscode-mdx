@@ -78,37 +78,24 @@ export interface Attribute extends NodeCommon {
     type: NodeType.Attribute;
     parent?: Element;
     /** 属性名称 */
-    name: string;
+    name: {
+        value: string;
+        range: Range;
+    };
     /** 属性值 */
-    value: string | boolean;
-    /** 属性名称结束位置 */
-    nameEnd: Location;
-    /** 属性值开始位置 */
-    valueStart: Location;
+    value: {
+        value: string | boolean;
+        range?: Range;
+    };
 }
 
-export interface Command extends NodeCommon {
+export interface Command extends Omit<Attribute, 'type'> {
     type: NodeType.Command;
-    parent?: Element;
-    /** 指令作为属性的完整名称 */
-    originName: string;
-    /** 指令名称 */
-    name: string;
-    /** 属性值 */
-    value: string | boolean;
+    /** 是否是缩写指令 */
+    isShortName: boolean;
     /**
-     * 指令名称结束位置
-     *  - 冒号前的位置
-     */
-    nameEnd: Location;
-    /**
-     * 属性值开始位置
-     *  - 等号或第一个引号后的位置
-     */
-    valueStart: Location;
-    /**
-     * 指令参数部分
-     *  - `:`之后的部分
+     * 指令参数
+     *  - `:`之后，等号之前的部分
      *  - `v-bind:test="test"`中`'test'`部分
      */
     arg?: {

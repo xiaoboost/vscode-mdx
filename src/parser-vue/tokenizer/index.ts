@@ -13,7 +13,6 @@ export class Scanner {
     private _state = ScannerState.WithinContent;
 
     private _lastTag = '';
-    private _lastAttributeName = '';
     private _hasSpaceAfterTag = false;
     private _lastAttrMark: number | null = null;
     private _lastState = ScannerState.WithinContent;
@@ -170,7 +169,6 @@ export class Scanner {
             }
             case ScannerState.AfterOpeningStartTag: {
                 this._lastTag = this.nextElementName();
-                this._lastAttributeName = '';
 
                 if (this._lastTag.length > 0) {
                     this._hasSpaceAfterTag = false;
@@ -205,61 +203,66 @@ export class Scanner {
                     return this.finishToken(startOffset, TokenKind.Whitespace);
                 }
 
-                // '@' or ':'
-                if (pointer.advanceIfOrChar([code.AT, code.COL])) {
-                    this.state = ScannerState.WithinCommand;
-                    return this.finishToken(startOffset, TokenKind.CommandName);
-                }
-
-                // v-
-                if (pointer.advanceIfChars([code.VChar, code.MIN])) {
-                    pointer.advanceIfRegExp(/^[^\s"':></=\x00-\x0F\x7F\x80-\x9F]*/);
-                    return this.finishToken(startOffset, TokenKind.CommandName);
-                }
-
+                debugger;
                 // 确实跳过了空白，接下来才允许是属性名称
                 if (this._hasSpaceAfterTag) {
-                    this._lastAttributeName = this.nextAttributeName();
+                    // '@' or ':'
+                    if (pointer.advanceIfOrChar([code.AT, code.COL])) {
+                        this.state = ScannerState.WithinCommand;
+                        return this.finishToken(startOffset, TokenKind.CommandShortName);
+                    }
+    
+                    // v-
+                    if (pointer.advanceIfChars([code.VChar, code.MIN])) {
+                        pointer.advanceIfRegExp(/^[^\s"':></=\x00-\x0F\x7F\x80-\x9F]*/);
+                        this.state = ScannerState.WithinCommand;
+                        return this.finishToken(startOffset, TokenKind.CommandName);
+                    }
 
-                    if (this._lastAttributeName.length > 0) {
+                    if (this.nextAttributeName().length > 0) {
                         this._hasSpaceAfterTag = false;
                         this.state = ScannerState.AfterAttributeName;
 
                         return this.finishToken(startOffset, TokenKind.AttributeName);
                     }
                 }
-
-                // '/>'
-                if (pointer.advanceIfChars([code.FSL, code.RAN])) {
-                    this.state = ScannerState.WithinContent;
-                    return this.finishToken(startOffset, TokenKind.StartTagSelfClose);
-                }
-
-                // '>'
-                if (pointer.advanceIfChar(code.RAN)) {
-                    const tagName = this._lastTag.toLowerCase();
-
-                    if (tagName === 'script') {
-                        this.state = ScannerState.WithinScriptContent;
-                    }
-                    else if (tagName === 'style') {
-                        this.state = ScannerState.WithinStyleContent;
-                    }
-                    else {
+                else {
+                    // '/>'
+                    if (pointer.advanceIfChars([code.FSL, code.RAN])) {
                         this.state = ScannerState.WithinContent;
+                        return this.finishToken(startOffset, TokenKind.StartTagSelfClose);
                     }
 
-                    return this.finishToken(startOffset, TokenKind.StartTagClose);
-                }
+                    // '>'
+                    if (pointer.advanceIfChar(code.RAN)) {
+                        const tagName = this._lastTag.toLowerCase();
 
-                // '<'
-                if (pointer.peekChar() === code.LAN) {
-                    this.state = ScannerState.WithinContent;
-                    return this.finishToken(startOffset, TokenKind.StartTagClose, errorText.closingBracketMissing);
+                        if (tagName === 'script') {
+                            this.state = ScannerState.WithinScriptContent;
+                        }
+                        else if (tagName === 'style') {
+                            this.state = ScannerState.WithinStyleContent;
+                        }
+                        else {
+                            this.state = ScannerState.WithinContent;
+                        }
+
+                        return this.finishToken(startOffset, TokenKind.StartTagClose);
+                    }
+
+                    // '<'
+                    if (pointer.peekChar() === code.LAN) {
+                        this.state = ScannerState.WithinContent;
+                        return this.finishToken(startOffset, TokenKind.StartTagClose, errorText.closingBracketMissing);
+                    }
                 }
 
                 pointer.advance(1);
                 return this.finishToken(startOffset, TokenKind.Unknown, errorText.unexpectedCharacterInTag);
+            }
+            case ScannerState.WithinCommand: {
+                debugger;
+                return this.scan();
             }
             case ScannerState.WithinMustache: {
                 const isStart = this._TokenKind === TokenKind.ContentMustacheStart;

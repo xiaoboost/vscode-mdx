@@ -1,5 +1,6 @@
 import { TokenKind, Scanner } from '../tokenizer';
 import { errorText } from './constant';
+import { clone } from '../../utils/object';
 
 import * as utils from './utils';
 
@@ -163,130 +164,12 @@ class Parser {
         }
     }
 
-    private  addAttr() {
-        if (this.curNode.type === NodeType.Attribute) {
-            this.curNode = this.curNode.parent as Element;
-        }
-
-        const node = this.curNode as Element;
-
-        let text = this.scanner.tokenText;
-
-        // 绑定值
-        if (text[0] === ':') {
-            text = `v-bind${text}`;
-        }
-        // 事件
-        else if (text[0] === '@') {
-            text = `v-on:${text.slice(1)}`;
-        }
-
-        // 指令
-        if (text.indexOf('v-') === 0) {
-            if (!node.commands) {
-                node.commands = [];
-            }
-
-            const [comName, argFull] = text.split(':');
-            const [arg, ...modifiers] = (argFull || '').split('.');
-            const commandStart = this.positionAt(this.scanner.tokenStart);
-            const atCommandOffset = (offset: number) => ({
-                line: commandStart.line,
-                col: (commandStart.col ?? 0) + offset,
-                offset: this.scanner.tokenStart + offset,
-            });
-            const commandNameEnd = atCommandOffset(comName.length);
-            const command: Command = {
-                type: NodeType.Command,
-                originName: text,
-                parent: node,
-                // 指令名称去掉前面的 v- 前缀
-                name: comName.substring(2),
-                value: '',
-                range: {
-                    start: commandStart,
-                    end: this.positionAt(this.scanner.tokenEnd),
-                },
-                nameEnd: commandNameEnd,
-                valueStart: { ...utils.nullLoc },
-            };
-            
-            // 判断重复
-            if (node.commands.find(({ originName }) => originName === text)) {
-                this.warnings.push({
-                    message: errorText.commandDuplicate,
-                    range: command.range,
-                });
-            }
-
-            // 有绑定参数
-            if (arg) {
-                command.arg = {
-                    name: arg,
-                    range: {
-                        start: atCommandOffset(comName.length + 1),
-                        end: atCommandOffset(comName.length + arg.length + 1),
-                    },
-                };
-
-                // 有修饰符
-                if (modifiers.length > 0) {
-                    
-                }
-            }
-
-            node.commands.push(command);
-            this.curNode = command;
-        }
-        // 属性
-        else {
-            if (!node.attrs) {
-                node.attrs = [];
-            }
-
-            const attr: Attribute = {
-                type: NodeType.Attribute,
-                parent: node,
-                value: '',
-                name: this.scanner.tokenText,
-                range: this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd),
-                nameEnd: this.positionAt(this.scanner.tokenEnd),
-                valueStart: utils.nullLoc,
-            };
-
-            if (node.attrs.find(({ name }) => name === attr.name)) {
-                this.warnings.push({
-                    message: errorText.attributeDuplicate,
-                    range: attr.range,
-                });
-            }
-
-            node.attrs.push(attr);
-
-            // TODO: 这里是否需要验证 style
-
-            this.curNode = attr;
-        }
-    }
-
     private checkElement(node = this.curNode) {
         if (node.type !== NodeType.Element) {
             return;
         }
 
-        if (node.tag === 'template') {
-            this.checkTemplate(node);
-        }
-
-        this.checkFor(node);
-    }
-
-    private checkTemplate(node: Element) {
-        // ..
-    }
-
-    private checkFor(node: Element) {
-        // ..
+        // TODO: for 等模板语法
     }
 
     parse() {
@@ -409,20 +292,126 @@ class Parser {
                     break;
                 }
                 case TokenKind.AttributeName: {
-                    this.addAttr();
+                    if (this.curNode.type === NodeType.Attribute) {
+                        this.curNode = this.curNode.parent as Element;
+                    }
+            
+                    const node = this.curNode as Element;
+            
+                    if (!node.attrs) {
+                        node.attrs = [];
+                    }
+
+                    const range = this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd);
+                    const attr: Attribute = {
+                        type: NodeType.Attribute,
+                        parent: node,
+                        range,
+                        value: {
+                            value: '',
+                        },
+                        name: {
+                            value: this.scanner.tokenText,
+                            range: clone(range),
+                        },
+                    };
+        
+                    if (node.attrs.find(({ name }) => name === attr.name)) {
+                        this.warnings.push({
+                            message: errorText.attributeDuplicate,
+                            range: attr.range,
+                        });
+                    }
+        
+                    node.attrs.push(attr);
+        
+                    this.curNode = attr;
                     break;
                 }
                 case TokenKind.AttributeValue: {
                     const attr = this.curNode as Attribute;
 
-                    attr.value = this.scanner.tokenText;
-                    attr.valueStart = this.positionAt(this.scanner.tokenStart);
                     attr.range.end = this.positionAt(this.scanner.tokenEnd);
+                    attr.value.value = this.scanner.tokenText;
+                    attr.value.range = {
+                        start: this.positionAt(this.scanner.tokenStart),
+                        end: { ...attr.range.end },
+                    };
+
+                    // TODO:
+                    if (attr.name.value === 'style') {
+
+                    }
 
                     break;
                 }
                 case TokenKind.AttributeMark: {
                     (this.curNode as Attribute).range.end = this.positionAt(this.scanner.tokenEnd);
+                    break;
+                }
+                case TokenKind.CommandName:
+                case TokenKind.CommandShortName: {
+                    if (this.curNode.type === NodeType.Attribute) {
+                        this.curNode = this.curNode.parent as Element;
+                    }
+            
+                    const node = this.curNode as Element;
+            
+                    if (!node.commands) {
+                        node.commands = [];
+                    }
+
+                    let commandName = this.scanner.tokenText;
+                    let isShortName = false;
+
+                    if (this.token === TokenKind.CommandShortName) {
+                        isShortName = true;
+                        if (commandName === '@') {
+                            commandName = 'on';
+                        }
+                        else if (commandName === ':') {
+                            commandName = 'bind';
+                        }
+                    }
+                    else {
+                        isShortName = false;
+                        commandName = commandName.slice(2);
+                    }
+        
+                    const range = this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd);
+                    const command: Command = {
+                        type: NodeType.Command,
+                        parent: node,
+                        isShortName,
+                        range,
+                        name: {
+                            value: commandName,
+                            range: clone(range),
+                        },
+                        value: {
+                            value: '',
+                        },
+                    };
+        
+                    if (node.commands.find(({ name }) => name.value === commandName)) {
+                        this.warnings.push({
+                            message: errorText.attributeDuplicate,
+                            range: command.range,
+                        });
+                    }
+        
+                    node.commands.push(command);
+        
+                    this.curNode = command;
+                    break;
+                }
+                case TokenKind.CommandArgument: {
+                    break;
+                }
+                case TokenKind.CommandColon: {
+                    break;
+                }
+                case TokenKind.CommandModifier: {
                     break;
                 }
                 case TokenKind.ContentMustacheStart: {
