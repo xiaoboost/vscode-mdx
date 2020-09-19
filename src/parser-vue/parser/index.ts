@@ -53,6 +53,7 @@ class Parser {
         this.options = {
             workspace: opt.workspace ?? '/',
             filePath: opt.filePath ?? './index.vue',
+            version: opt.version ?? '3.0',
             location: opt.location ?? true,
             errorDetail: opt.errorDetail ?? false,
         };
@@ -173,6 +174,8 @@ class Parser {
     }
 
     parse() {
+        const { scanner } = this;
+
         while (this.token !== TokenKind.EOS) {
             switch (this.token) {
                 case TokenKind.StartCommentTag: {
@@ -181,7 +184,7 @@ class Parser {
                         text: '',
                         parent: this.curNode,
                         range: {
-                            start: this.positionAt(this.scanner.tokenStart),
+                            start: this.positionAt(scanner.tokenStart),
                             end: utils.nullLoc,
                         },
                     };
@@ -197,17 +200,17 @@ class Parser {
                 case TokenKind.EndCommentTag: {
                     const node = this.curNode as Comment;
 
-                    node.range.end = this.positionAt(this.scanner.tokenEnd);
+                    node.range.end = this.positionAt(scanner.tokenEnd);
                     this.curNode = node.parent as Node;
                     break;
                 }
                 case TokenKind.Comment: {
-                    (this.curNode as Comment).text = this.scanner.tokenText;
+                    (this.curNode as Comment).text = scanner.tokenText;
                     break;
                 }
                 case TokenKind.Content: {
-                    const start = this.scanner.tokenStart;
-                    const end = this.scanner.tokenEnd;
+                    const start = scanner.tokenStart;
+                    const end = scanner.tokenEnd;
 
                     if (!this.curNode.children) {
                         this.curNode.children = [];
@@ -228,7 +231,7 @@ class Parser {
                     const node: Element = {
                         type: NodeType.Element,
                         range: {
-                            start: this.positionAt(this.scanner.tokenStart),
+                            start: this.positionAt(scanner.tokenStart),
                             end: utils.nullLoc,
                         },
                         parent: this.curNode,
@@ -252,7 +255,7 @@ class Parser {
                         node = node.parent!;
                     }
 
-                    node.startTagEnd = this.positionAt(this.scanner.tokenEnd);
+                    node.startTagEnd = this.positionAt(scanner.tokenEnd);
 
                     this.curNode = node;
                     break;
@@ -263,7 +266,7 @@ class Parser {
                     }
 
                     const node = this.curNode as Element;
-                    const endPosition = this.positionAt(this.scanner.tokenEnd);
+                    const endPosition = this.positionAt(scanner.tokenEnd);
 
                     node.selfClose = true;
                     node.range.end = endPosition;
@@ -275,12 +278,12 @@ class Parser {
                     break;
                 }
                 case TokenKind.StartTag: {
-                    (this.curNode as Element).tag = this.scanner.tokenText.toLowerCase();
+                    (this.curNode as Element).tag = scanner.tokenText.toLowerCase();
                     break;
                 }
                 case TokenKind.EndTagOpen: {
                     this.endTagName = '';
-                    this.endTagStart = this.positionAt(this.scanner.tokenStart);
+                    this.endTagStart = this.positionAt(scanner.tokenStart);
                     break;
                 }
                 case TokenKind.EndTagClose: {
@@ -288,7 +291,7 @@ class Parser {
                     break;
                 }
                 case TokenKind.EndTag: {
-                    this.endTagName = this.scanner.tokenText.toLowerCase();
+                    this.endTagName = scanner.tokenText.toLowerCase();
                     break;
                 }
                 case TokenKind.AttributeName: {
@@ -302,7 +305,7 @@ class Parser {
                         node.attrs = [];
                     }
 
-                    const range = this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd);
+                    const range = this.rangeAt(scanner.tokenStart, scanner.tokenEnd);
                     const attr: Attribute = {
                         type: NodeType.Attribute,
                         parent: node,
@@ -311,7 +314,7 @@ class Parser {
                             value: '',
                         },
                         name: {
-                            value: this.scanner.tokenText,
+                            value: scanner.tokenText,
                             range: clone(range),
                         },
                     };
@@ -331,10 +334,10 @@ class Parser {
                 case TokenKind.AttributeValue: {
                     const attr = this.curNode as Attribute;
 
-                    attr.range.end = this.positionAt(this.scanner.tokenEnd);
-                    attr.value.value = this.scanner.tokenText;
+                    attr.range.end = this.positionAt(scanner.tokenEnd);
+                    attr.value.value = scanner.tokenText;
                     attr.value.range = {
-                        start: this.positionAt(this.scanner.tokenStart),
+                        start: this.positionAt(scanner.tokenStart),
                         end: { ...attr.range.end },
                     };
 
@@ -346,7 +349,7 @@ class Parser {
                     break;
                 }
                 case TokenKind.AttributeMark: {
-                    (this.curNode as Attribute).range.end = this.positionAt(this.scanner.tokenEnd);
+                    (this.curNode as Attribute).range.end = this.positionAt(scanner.tokenEnd);
                     break;
                 }
                 case TokenKind.CommandName:
@@ -361,7 +364,7 @@ class Parser {
                         node.commands = [];
                     }
 
-                    let commandName = this.scanner.tokenText;
+                    let commandName = scanner.tokenText;
                     let isShortName = false;
 
                     if (this.token === TokenKind.CommandShortName) {
@@ -378,7 +381,7 @@ class Parser {
                         commandName = commandName.slice(2);
                     }
         
-                    const range = this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd);
+                    const range = this.rangeAt(scanner.tokenStart, scanner.tokenEnd);
                     const command: Command = {
                         type: NodeType.Command,
                         parent: node,
@@ -406,12 +409,43 @@ class Parser {
                     break;
                 }
                 case TokenKind.CommandArgument: {
-                    break;
-                }
-                case TokenKind.CommandColon: {
+                    const command = this.curNode as Command;
+
+                    command.arg = {
+                        value: scanner.tokenText,
+                        range: this.rangeAt(scanner.tokenStart, scanner.tokenEnd),
+                    };
+
+                    if (command.arg.value[0] === ':') {
+                        command.arg.value = command.arg.value.slice(1);
+                        command.arg.range.start.offset++;
+                        command.arg.range.start.col!++;
+                    }
+
                     break;
                 }
                 case TokenKind.CommandModifier: {
+                    const command = this.curNode as Command;
+                    const name = scanner.tokenText.slice(1);
+
+                    if (!command.modifiers) {
+                        command.modifiers = [];
+                    }
+
+                    const modifier = {
+                        value: name,
+                        range: this.rangeAt(scanner.tokenStart + 1, scanner.tokenEnd),
+                    };
+
+                    if (command.modifiers.find(({ value }) => value === name)) {
+                        this.warnings.push({
+                            message: 'Command modifier duplicate.',
+                            range: clone(modifier.range),
+                        });
+                    }
+
+                    command.modifiers.push(modifier);
+
                     break;
                 }
                 case TokenKind.ContentMustacheStart: {
@@ -426,7 +460,7 @@ class Parser {
                         text: '',
                         parent: attr,
                         range: {
-                            start: this.positionAt(this.scanner.tokenStart),
+                            start: this.positionAt(scanner.tokenStart),
                             end: utils.nullLoc,
                         },
                     };
@@ -437,22 +471,22 @@ class Parser {
                     break;
                 }
                 case TokenKind.ContentMustacheEnd: {
-                    this.curNode.range.end = this.positionAt(this.scanner.tokenEnd);
+                    this.curNode.range.end = this.positionAt(scanner.tokenEnd);
                     this.curNode = this.curNode.parent as Node;
                     break;
                 }
                 case TokenKind.ContentMustache: {
-                    (this.curNode as ContentMustache).text = this.scanner.tokenText;
+                    (this.curNode as ContentMustache).text = scanner.tokenText;
                     break;
                 }
                 // TODO:
                 case TokenKind.Script: {
-                    (this.curNode as Script).text = this.scanner.tokenText;
+                    (this.curNode as Script).text = scanner.tokenText;
                     break;
                 }
                 // TODO:
                 case TokenKind.Style: {
-                    (this.curNode as Style).text = this.scanner.tokenText;
+                    (this.curNode as Style).text = scanner.tokenText;
                     break;
                 }
                 case TokenKind.Whitespace: {
@@ -460,22 +494,22 @@ class Parser {
                 }
                 case TokenKind.Unknown: {
                     this.errors.push({
-                        message: this.scanner.tokenError ?? '',
-                        range: this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd),
+                        message: scanner.tokenError ?? '',
+                        range: this.rangeAt(scanner.tokenStart, scanner.tokenEnd),
                     });
 
                     break;
                 }
             }
 
-            if (this.scanner.tokenError && this.scanner.TokenKind !== TokenKind.Unknown) {
+            if (scanner.tokenError && scanner.TokenKind !== TokenKind.Unknown) {
                 this.errors.push({
-                    message: this.scanner.tokenError,
-                    range: this.rangeAt(this.scanner.tokenStart, this.scanner.tokenEnd),
+                    message: scanner.tokenError,
+                    range: this.rangeAt(scanner.tokenStart, scanner.tokenEnd),
                 });
             }
 
-            this.token = this.scanner.scan();
+            this.token = scanner.scan();
         }
 
         this.closeRoot();

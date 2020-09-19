@@ -4,6 +4,12 @@ import { code, errorText, scriptEndTagCodes, styleEndTagCodes } from './constant
 
 export * from './types';
 
+const ElementName = /^[_:\w][_:\w-.\d]*/;
+const CommandRegCommon = '\\s"\'></=\\x00-\\x0F\\x7F\\x80-\\x9F';
+const AttributeName = new RegExp(`^[^${CommandRegCommon}]*`);
+const CommandName = new RegExp(`^[^:.${CommandRegCommon}]*`);
+const CommandArg = new RegExp(`^[:.]?[^.${CommandRegCommon}]*`);
+
 /** Token 标记扫描器 */
 export class Scanner {
     private _pointer: CodePointer;
@@ -51,14 +57,6 @@ export class Scanner {
 
     get tokenError() {
         return this._tokenError;
-    }
-
-    private nextElementName() {
-        return this._pointer.advanceIfRegExp(/^[_:\w][_:\w-.\d]*/);
-    }
-
-    private nextAttributeName() {
-        return this._pointer.advanceIfRegExp(/^[:@]?[^\s"':.></=\x00-\x0F\x7F\x80-\x9F]*/);
     }
 
     private finishToken(startOffset: number, type: TokenKind, errorMessage?: string) {
@@ -125,7 +123,7 @@ export class Scanner {
                 }
             }
             case ScannerState.AfterOpeningEndTag: {
-                const tagName = this.nextElementName();
+                const tagName = pointer.advanceIfRegExp(ElementName);
 
                 if (tagName.length > 0) {
                     this.state = ScannerState.WithinEndTag;
@@ -168,7 +166,7 @@ export class Scanner {
                 break;
             }
             case ScannerState.AfterOpeningStartTag: {
-                this._lastTag = this.nextElementName();
+                this._lastTag = pointer.advanceIfRegExp(ElementName);
 
                 if (this._lastTag.length > 0) {
                     this._hasSpaceAfterTag = false;
@@ -203,7 +201,6 @@ export class Scanner {
                     return this.finishToken(startOffset, TokenKind.Whitespace);
                 }
 
-                debugger;
                 // 确实跳过了空白，接下来才允许是属性名称
                 if (this._hasSpaceAfterTag) {
                     // '@' or ':'
@@ -214,12 +211,12 @@ export class Scanner {
     
                     // v-
                     if (pointer.advanceIfChars([code.VChar, code.MIN])) {
-                        pointer.advanceIfRegExp(/^[^\s"':></=\x00-\x0F\x7F\x80-\x9F]*/);
+                        pointer.advanceIfRegExp(CommandName);
                         this.state = ScannerState.WithinCommand;
                         return this.finishToken(startOffset, TokenKind.CommandName);
                     }
 
-                    if (this.nextAttributeName().length > 0) {
+                    if (pointer.advanceIfRegExp(AttributeName).length > 0) {
                         this._hasSpaceAfterTag = false;
                         this.state = ScannerState.AfterAttributeName;
 
@@ -261,7 +258,32 @@ export class Scanner {
                 return this.finishToken(startOffset, TokenKind.Unknown, errorText.unexpectedCharacterInTag);
             }
             case ScannerState.WithinCommand: {
+                const startChar = pointer.peekChar();
+                const lastChar = pointer.peekChar(-1);
+
                 debugger;
+                // 当前字符是 ':'，或者上一个字符是 '@'、':'
+                if (startChar === code.COL || lastChar === code.COL || lastChar === code.AT) {
+                    if (pointer.advanceIfRegExp(CommandArg).length > 0) {
+                        return this.finishToken(startOffset, TokenKind.CommandArgument);
+                    }
+                    else {
+                        this.finishToken(startOffset, TokenKind.Unknown, errorText.commandArgumentExpected);
+                    }
+                }
+
+                // '.'
+                if (startChar === code.DOT) {
+                    if (pointer.advanceIfRegExp(CommandArg).length > 0) {
+                        return this.finishToken(startOffset, TokenKind.CommandModifier);
+                    }
+                    else {
+                        this.finishToken(startOffset, TokenKind.Unknown, errorText.commandModifierExpected);
+                    }
+                }
+
+                // 指令读取完毕
+                this.state = ScannerState.AfterAttributeName;
                 return this.scan();
             }
             case ScannerState.WithinMustache: {

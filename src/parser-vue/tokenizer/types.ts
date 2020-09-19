@@ -24,7 +24,6 @@ export enum TokenKind {
     AttributeValue,
 
     // Command
-    CommandColon,
     CommandName,
     CommandShortName,
     CommandArgument,

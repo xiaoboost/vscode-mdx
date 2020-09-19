@@ -99,7 +99,7 @@ export interface Command extends Omit<Attribute, 'type'> {
      *  - `v-bind:test="test"`中`'test'`部分
      */
     arg?: {
-        name: string;
+        value: string;
         range: Range;
     };
     /**
@@ -108,7 +108,7 @@ export interface Command extends Omit<Attribute, 'type'> {
      *  - `v-on:click.left.stop`中`['left', 'stop']`的部分
      */
     modifiers?: {
-        name: string;
+        value: string;
         range: Range;
     }[];
 }
@@ -116,6 +116,8 @@ export interface Command extends Omit<Attribute, 'type'> {
 export interface ParserOptions {
     location?: boolean;
     errorDetail?: boolean;
+    /** 当前 vue 版本 */
+    version?: string;
     /**
      * 项目根目录路径
      *  - 默认值是`/`

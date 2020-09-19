@@ -38,6 +38,8 @@ export const code = {
     AT: '@'.charCodeAt(0),
     /** 冒号 */
     COL: ':'.charCodeAt(0),
+    /** 点号 */
+    DOT: '.'.charCodeAt(0),
     /** 字母 V */
     VChar: 'v'.charCodeAt(0),
 };
@@ -47,6 +49,8 @@ export const errorText = {
     unexpectedWhitespace: 'Tag name must directly follow the open bracket.',
     startTagNameExpected: 'Start tag name expected.',
     mustacheEndExpected: 'Mustache end expected.',
+    commandModifierExpected: 'Command modifier Expected',
+    commandArgumentExpected: 'Command argument Expected',
     closingBracketMissing: 'Closing bracket missing.',
     closingBracketExpected: 'Closing bracket expected.',
     unexpectedCharacterInTag: 'Unexpected character in tag.',
