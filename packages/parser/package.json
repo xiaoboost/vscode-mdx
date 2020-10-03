@@ -1,53 +1,54 @@
 {
-  "name": "@xvue/parser",
-  "version": "0.0.1",
-  "description": "",
-  "author": "xiaoboost",
-  "license": "ISC",
-  "main": "dist/cjs",
-  "module": "dist/es",
-  "types": "dist/types",
+  "name": "@mdx/parser",
+  "version": "1.0.0",
+  "description": "mdx parser",
+  "license": "MIT",
+  "source": "./src/index.ts",
+  "types": "./src/index.ts",
+  "main": "./dist/index.js",
   "keywords": [
-    "vue",
+    "mdx",
     "parser"
   ],
   "scripts": {
-    "clear": "rimraf ./dist",
-    "dev": "tsc -p ./tsconfig.build.json --outDir ./dev --declarationDir ./dev -w",
-    "build:cjs": "tsc -p ./tsconfig.build.json --outDir ./dist/cjs --module commonjs",
-    "build:es": "tsc -p ./tsconfig.build.json --outDir ./dist/es  --module esnext",
-    "build": "pnpm run clear && pnpm run build:cjs && pnpm run build:es",
-    "prepare": "pnpm run build"
+    "build": "tsc -p ./tsconfig.build.json",
+    "watch": "pnpm run build -- -w",
+    "test": "ava -v",
+    "test:update": "ava -u",
+    "lint": "eslint --quiet --no-error-on-unmatched-pattern --config ../../.eslintrc.js src/**/*.{ts,tsx,js,jsx}",
+    "lint:fix": "eslint --fix --quiet --no-error-on-unmatched-pattern --config ../../.eslintrc.js src/**/*.{ts,tsx,js,jsx}"
   },
   "ava": {
-    "serial": true,
     "extensions": [
       "ts"
     ],
     "require": [
-      "ts-node/register/transpile-only.js",
-      "tsconfig-paths/register.js"
+      "ts-node/register/transpile-only"
     ],
     "environmentVariables": {
-      "TS_NODE_PROJECT": "tsconfig.test.json"
+      "TS_NODE_PROJECT": "tsconfig.json"
     },
     "files": [
       "tests/**/*.spec.ts"
     ]
   },
   "dependencies": {
-    "@xvue/utils": "workspace:*",
-    "line-column": "^1.0.2",
-    "path-browserify": "^1.0.1",
-    "tslib": "^2.0.1"
+    "@mdx/source-map": "workspace:*",
+    "@mdx/utils": "workspace:*",
+    "@xiao-ai/utils": "^1.4.3"
   },
   "devDependencies": {
-    "@types/line-column": "^1.0.0",
-    "ava": "^3.13.0",
-    "nyc": "^15.1.0",
-    "rimraf": "^3.0.2",
-    "ts-node": "~8.10.2",
-    "tsconfig-paths": "^3.9.0",
-    "typescript": "^4.0.3"
+    "@mdx/tsconfig": "workspace:*",
+    "@types/mdx": "workspace:*",
+    "@types/node": "^16.11.6",
+    "ava": "^3.15.0",
+    "eslint": "^8.1.0",
+    "remark": "^14.0.1",
+    "remark-mdx": "^1.6.22",
+    "remark-parse": "^10.0.0",
+    "ts-node": "^10.4.0",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.4",
+    "unified": "^10.1.0"
   }
 }

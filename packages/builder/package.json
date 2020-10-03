@@ -1,0 +1,43 @@
+{
+  "name": "@mdx/builder",
+  "description": "mdx extension builder",
+  "version": "1.0.0",
+  "bin": {
+    "mdx": "./bin/index.js"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc -p ./tsconfig.build.json",
+    "watch": "pnpm run build -- -w",
+    "lint": "eslint --quiet --no-error-on-unmatched-pattern --config ../../.eslintrc.js src/**/*.{ts,tsx,js,jsx}",
+    "lint:fix": "eslint --fix --quiet --no-error-on-unmatched-pattern --config ../../.eslintrc.js src/**/*.{ts,tsx,js,jsx}"
+  },
+  "dependencies": {
+    "@mdx/client": "workspace:*",
+    "@mdx/language-server": "workspace:*",
+    "@mdx/language-syntax": "workspace:*",
+    "vsce": "^1.100.2"
+  },
+  "devDependencies": {
+    "@mdx/tsconfig": "workspace:*",
+    "@mdx/utils": "workspace:*",
+    "@types/copy-webpack-plugin": "^8.0.1",
+    "@types/mdx": "workspace:*",
+    "@types/node": "^16.11.6",
+    "@types/webpack-bundle-analyzer": "^4.4.1",
+    "@types/yargs": "^17.0.4",
+    "chalk": "^4.1.2",
+    "copy-webpack-plugin": "^9.0.1",
+    "esbuild-loader": "^2.16.0",
+    "generate-json-webpack-plugin": "^2.0.0",
+    "progress-bar-webpack-plugin": "^2.1.0",
+    "require-split-chunk-webpack-plugin": "^2.0.2",
+    "terser-webpack-plugin": "^5.2.4",
+    "ts-loader": "^9.2.6",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.4",
+    "webpack": "^5.61.0",
+    "webpack-bundle-analyzer": "^4.5.0",
+    "yargs": "^17.2.1"
+  }
+}

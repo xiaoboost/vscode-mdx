@@ -1,0 +1,51 @@
+{
+  "name": "@mdx/file-system",
+  "version": "1.0.0",
+  "description": "file system",
+  "license": "MIT",
+  "source": "./src/index.ts",
+  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "keywords": [
+    "file-system",
+    "fs"
+  ],
+  "scripts": {
+    "test": "ava -v",
+    "build": "tsc -p ./tsconfig.build.json",
+    "watch": "pnpm run build -- -w",
+    "lint": "eslint --quiet --no-error-on-unmatched-pattern --config ../../.eslintrc.js src/**/*.{ts,tsx,js,jsx}",
+    "lint:fix": "eslint --fix --quiet --no-error-on-unmatched-pattern --config ../../.eslintrc.js src/**/*.{ts,tsx,js,jsx}"
+  },
+  "ava": {
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register/transpile-only"
+    ],
+    "environmentVariables": {
+      "TS_NODE_PROJECT": "tsconfig.json"
+    },
+    "files": [
+      "tests/**/*.spec.ts"
+    ]
+  },
+  "dependencies": {
+    "@mdx/parser": "workspace:*",
+    "@mdx/source-map": "workspace:*",
+    "@mdx/utils": "workspace:*",
+    "@xiao-ai/utils": "^1.4.3",
+    "vscode-languageserver-textdocument": "^1.0.2",
+    "vscode-languageserver-types": "^3.16.0"
+  },
+  "devDependencies": {
+    "@mdx/tsconfig": "workspace:*",
+    "@types/mdx": "workspace:*",
+    "@types/node": "^16.11.6",
+    "ava": "^3.15.0",
+    "ts-node": "^10.4.0",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.4"
+  }
+}

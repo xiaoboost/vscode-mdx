@@ -1,0 +1,46 @@
+{
+  // 使用 IntelliSense 了解相关属性。
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "构建测试",
+      "program": "${workspaceFolder}/packages/builder/bin/index.js",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "watch",
+        "--outDir=dist/development",
+        "--development"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "解析器测试",
+      "program": "${workspaceFolder}/packages/parser/draft/index.js",
+    },
+    {
+      "type": "extensionHost",
+      "request": "launch",
+      "name": "Client",
+      "runtimeExecutable": "${execPath}",
+      "args": ["--extensionDevelopmentPath=${workspaceRoot}/dist/development", "--disable-extensions"]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Language Server",
+      "port": 6009,
+      "restart": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Client + Server",
+      "configurations": ["Client", "Language Server"]
+    }
+  ]
+}

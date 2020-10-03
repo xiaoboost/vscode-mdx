@@ -1,0 +1,9 @@
+{
+  "extends": "@mdx/tsconfig",
+  "include": ["src", "entry", "typings"],
+  "compilerOptions": {
+    "outDir": "dist",
+    "declarationDir": "dist",
+    "module": "CommonJS"
+  }
+}

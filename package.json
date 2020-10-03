@@ -1,105 +1,42 @@
 {
-  "name": "vscode-extension-vue",
-  "version": "0.0.1",
-  "description": "",
-  "scripts": {
-    "clear": "rimraf ./dist",
-    "watch": "pnpm run clear && tsc -p ./tsconfig.watch.json --module CommonJS -w",
-    "dev": "pnpm run clear && ts-node-transpile-only --project ./tsconfig.compile.json ./build/webpack.ts --development",
-    "build": "pnpm run clear && ts-node-transpile-only --project ./tsconfig.compile.json ./build/webpack.ts --production",
-    "build:analyze": "pnpm run clear && ts-node-transpile-only --project tsconfig.compile.json ./build/webpack.ts --production --analyze",
-    "test": "nyc ava --no-cache --reporter=text-summary",
-    "test:report": "nyc ava --reporter=html"
-  },
+  "name": "vscode-mdx",
+  "displayName": "VSCode MDX 2",
+  "version": "0.1.0",
   "author": "xiaoboost",
   "publisher": "xiaoboost",
-  "license": "ISC",
+  "description": "language support for MDX",
+  "license": "MIT",
+  "keywords": [
+    "mdx",
+    "Markdown React",
+    "vscode-extension"
+  ],
+  "scripts": {
+    "update": "pnpm update -r",
+    "build": "mdx build --outDir=dist/generated --production",
+    "build:dep": "pnpm run build --filter @mdx/builder...",
+    "build:analyze": "mdx build --outDir=dist/generated --production --bundleAnalyze",
+    "watch": "mdx watch --outDir=dist/development --development",
+    "package": "mdx package --input=dist/generated --output=dist/package/[name]-[version].vsix",
+    "generate": "pnpm run build:dep && pnpm run build && pnpm run package",
+    "test": "pnpm run -r test --parallel --filter .",
+    "test:update": "pnpm run -r test:update --parallel --filter .",
+    "lint": "pnpm run -r lint --parallel --filter .",
+    "lint:fix": "pnpm run -r lint:fix --parallel --filter ."
+  },
+  "engines": {
+    "vscode": "^1.20.0",
+    "pnpm": ">= 6.0.0"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xiaoboost/vscode-extension-vue"
-  },
-  "main": "./scripts/client.js",
-  "keywords": [
-    "vue",
-    "vscode-extension",
-    "language-server"
-  ],
-  "engines": {
-    "vscode": "^1.20.0"
-  },
-  "activationEvents": [
-    "onLanguage:vue"
-  ],
-  "contributes": {
-    "languages": [
-      {
-        "id": "vue",
-        "configuration": "./syntax/vue-configuration.json",
-        "aliases": [
-          "Vue",
-          "vue"
-        ],
-        "extensions": [
-          ".vue"
-        ]
-      }
-    ]
-  },
-  "ava": {
-    "serial": true,
-    "extensions": [
-      "ts"
-    ],
-    "require": [
-      "ts-node/register/transpile-only.js",
-      "tsconfig-paths/register.js"
-    ],
-    "environmentVariables": {
-      "TS_NODE_PROJECT": "tsconfig.test.json"
-    },
-    "files": [
-      "tests/**/*.spec.ts"
-    ]
-  },
-  "dependencies": {
-    "line-column": "^1.0.2",
-    "path-browserify": "^1.0.1",
-    "typescript": "^4.0.3",
-    "vscode-languageclient": "^6.1.3",
-    "vscode-languageserver": "^6.1.1",
-    "vscode-languageserver-textdocument": "^1.0.1",
-    "vscode-uri": "^2.1.2"
+    "url": "https://github.com/xiaoboost/vscode-mdx"
   },
   "devDependencies": {
-    "@types/copy-webpack-plugin": "^6.0.0",
-    "@types/friendly-errors-webpack-plugin": "^0.1.2",
-    "@types/generate-json-webpack-plugin": "^0.3.1",
-    "@types/line-column": "^1.0.0",
-    "@types/node": "^14.11.1",
-    "@types/progress-bar-webpack-plugin": "^2.1.0",
-    "@types/terser-webpack-plugin": "^4.2.0",
-    "@types/vscode": "^1.49.0",
-    "@types/webpack-bundle-analyzer": "^3.8.0",
-    "@typescript-eslint/eslint-plugin": "^4.1.1",
-    "@typescript-eslint/parser": "^4.1.1",
-    "ava": "^3.12.1",
-    "chalk": "^4.1.0",
-    "copy-webpack-plugin": "^6.1.1",
-    "eslint": "^7.9.0",
-    "friendly-errors-webpack-plugin": "^1.7.0",
-    "generate-json-webpack-plugin": "^1.0.0",
-    "nyc": "^15.1.0",
-    "progress-bar-webpack-plugin": "^2.1.0",
-    "require-split-chunk-webpack-plugin": "^1.0.1",
-    "rimraf": "^3.0.2",
-    "terser-webpack-plugin": "^4.2.1",
-    "ts-loader": "^8.0.4",
-    "ts-node": "~8.10.2",
-    "tsconfig-paths": "^3.9.0",
-    "tsconfig-paths-webpack-plugin": "^3.3.0",
-    "tslib": "^2.0.1",
-    "webpack": "^4.44.2",
-    "webpack-bundle-analyzer": "^3.9.0",
-    "yaml": "^1.10.0"
+    "@mdx/builder": "workspace:*",
+    "@typescript-eslint/eslint-plugin": "^5.2.0",
+    "@typescript-eslint/parser": "^5.2.0",
+    "eslint": "^8.1.0",
+    "typescript": "^4.4.4"
   }
 }

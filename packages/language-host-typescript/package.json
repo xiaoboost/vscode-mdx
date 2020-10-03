@@ -1,0 +1,27 @@
+{
+  "name": "@mdx/language-host-typescript",
+  "description": "vscode mdx typescript language host",
+  "version": "1.0.0",
+  "source": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc -p .",
+    "watch": "pnpm run build -- -w",
+    "lint": "eslint --quiet --no-error-on-unmatched-pattern --config ../../.eslintrc.js src/**/*.{ts,tsx,js,jsx}",
+    "lint:fix": "eslint --fix --quiet --no-error-on-unmatched-pattern --config ../../.eslintrc.js src/**/*.{ts,tsx,js,jsx}"
+  },
+  "dependencies": {
+    "@mdx/file-system": "workspace:*",
+    "@mdx/language-internal": "workspace:*",
+    "@mdx/utils": "workspace:*",
+    "@xiao-ai/utils": "^1.4.3",
+    "compare-versions": "^3.6.0"
+  },
+  "devDependencies": {
+    "@mdx/tsconfig": "workspace:*",
+    "@types/mdx": "workspace:*",
+    "@types/node": "^16.11.6",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.4"
+  }
+}

@@ -1,33 +1,84 @@
-module.exports =  {
-    parser: '@typescript-eslint/parser',
-    extends: [
-        'plugin:@typescript-eslint/recommended',
-    ],
-    plugins: [
-        '@typescript-eslint',
-    ],
-    parserOptions: {
-        ecmaVersion: 2019,
-        project: './tsconfig.json',
-        sourceType: 'module',
-        tsconfigRootDir: './',
+const path = require('path');
+const fs = require('fs');
+const workspace = process.cwd();
+const rootWorkspace = findRootWorkspace(workspace);
+const projectConfig = path.join(rootWorkspace, 'tsconfig.test.json');
+const relativeRoot = path.relative(rootWorkspace, workspace);
+
+const ignorePaths = [
+  'dev/*',
+  'dist/*',
+  'draft/*',
+  'coverage/*',
+  '.vscode/*',
+  '.eslintrc.js',
+  '**/*.js',
+].map((name) => path.join(relativeRoot, name).replace(/\\+/g, '/'));
+
+function findRootWorkspace(fsPath) {
+  const isRoot = (fsPath) => fs.existsSync(path.join(fsPath, 'pnpm-lock.yaml'));
+
+  let current = fsPath;
+  let last;
+
+  while(!isRoot(current) && last !== current) {
+    current = path.dirname(current);
+  }
+
+  return current;
+}
+
+module.exports = {
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
+  ignorePatterns: ignorePaths,
+  parserOptions: {
+    project: projectConfig,
+    ecmaFeatures: {
+      jsx: true,
     },
-    env: {
-        node: true,
-        es6: true,
+  },
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
+  settings: {
+    react: {
+      pragma: 'React',
+      version: '17',
     },
-    rules: {
-        // 允许使用显式的 any 类型
-        '@typescript-eslint/no-explicit-any': 'off',
-        // 允许使用非空断言
-        '@typescript-eslint/no-non-null-assertion': 'off',
-        // 不禁止任何类型
-        '@typescript-eslint/ban-types': 'off',
-        // 允许对具有初始化语句的变量额外标注类型
-        '@typescript-eslint/no-inferrable-types': 'off',
-        // 允许使用 namespace
-        '@typescript-eslint/no-namespace': 'off',
-        // 函数允许不显式提供返回类型
-        '@typescript-eslint/explicit-module-boundary-types': 'off',
-    },
+  },
+  rules: {
+    'no-prototype-builtins': 'off',
+    'no-sparse-arrays': 'off',
+    'indent': 'off',
+    'brace-style': 'off',
+    'no-debugger': 'off',
+
+    'max-len': ['warn', {
+      code: 100,
+    }],
+    'keyword-spacing': 'error',
+    'curly': 'error',
+    'eqeqeq': ['error', 'always'],
+    'no-extra-label': 'error',
+    'no-implicit-coercion': 'error',
+    'no-multi-spaces': 'error',
+    'no-irregular-whitespace': 'off',
+
+    'react/prop-types': 'off',
+
+    '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/no-empty-interface': 'off',
+    '@typescript-eslint/no-this-alias': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/indent':  ['error', 2, {
+      SwitchCase: 1,
+    }],
+    '@typescript-eslint/brace-style': ['error', 'stroustrup', {
+      allowSingleLine: true,
+    }],
+  },
 };

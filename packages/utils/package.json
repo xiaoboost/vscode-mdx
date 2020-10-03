@@ -1,43 +1,40 @@
 {
-  "name": "@xvue/utils",
+  "name": "@mdx/utils",
+  "description": "MDX common utils",
   "version": "1.0.0",
-  "description": "utils for xvue",
-  "author": "xiaoboost",
-  "license": "ISC",
-  "module": ".",
-  "types": ".",
+  "source": "./src/index.ts",
+  "types": "./src/index.ts",
+  "main": "./dist/index.js",
   "scripts": {
-    "clear": "rimraf ./dist",
-    "dev": "tsc -w -p ./tsconfig.dev.json",
-    "build:es": "tsc -p ./tsconfig.build.json",
-    "build": "pnpm run clear && pnpm run build:es",
-    "prepare": "pnpm run build"
+    "test": "ava -v",
+    "build": "tsc -p ./tsconfig.build.json",
+    "watch": "pnpm run build -- -w",
+    "lint": "eslint --quiet --no-error-on-unmatched-pattern --config ../../.eslintrc.js src/**/*.{ts,tsx,js,jsx}",
+    "lint:fix": "eslint --fix --quiet --no-error-on-unmatched-pattern --config ../../.eslintrc.js src/**/*.{ts,tsx,js,jsx}"
   },
   "ava": {
-    "serial": true,
     "extensions": [
       "ts"
     ],
     "require": [
-      "ts-node/register/transpile-only.js",
-      "tsconfig-paths/register.js"
+      "ts-node/register/transpile-only"
     ],
     "environmentVariables": {
-      "TS_NODE_PROJECT": "tsconfig.test.json"
+      "TS_NODE_PROJECT": "tsconfig.json"
     },
     "files": [
       "tests/**/*.spec.ts"
     ]
   },
   "dependencies": {
-    "tslib": "^2.0.1"
+    "vscode-uri": "^3.0.2"
   },
   "devDependencies": {
-    "ava": "^3.12.1",
-    "nyc": "^15.1.0",
-    "rimraf": "^3.0.2",
-    "ts-node": "~8.10.2",
-    "tsconfig-paths": "^3.9.0",
-    "typescript": "^4.0.3"
+    "@mdx/tsconfig": "workspace:*",
+    "@types/mdx": "workspace:*",
+    "ava": "^3.15.0",
+    "ts-node": "^10.4.0",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.4"
   }
 }

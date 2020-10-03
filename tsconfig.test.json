@@ -1,9 +1,20 @@
 {
-    "extends": "./tsconfig.json",
-    "compilerOptions": {
-        "module": "commonjs",
-        "target": "ES2018"
-    },
-    "include": ["src", "tests", "typings"],
-    "exclude": ["build", "node_modules"]
+  "compilerOptions": {
+    "noEmit": true,
+    "target": "ESNext",
+    "module": "CommonJS",
+    "jsx": "react",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "checkJs": true,
+    "allowJs": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "lib": ["ESNext", "DOM"]
+  }
 }
