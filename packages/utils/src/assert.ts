@@ -1,3 +1,5 @@
+type AnyFunction = (...args: any[]) => any;
+
 const _toString = Object.prototype.toString;
 
 /** 基础类型 */
