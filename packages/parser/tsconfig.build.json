@@ -1,8 +1,9 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "dev",
-    "sourceMap": true
+    "module": "ESNext",
+    "target": "ES2018",
+    "sourceMap": false
   },
   "include": ["src", "typings"]
 }

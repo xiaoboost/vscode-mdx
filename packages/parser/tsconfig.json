@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "dist",
+    "declarationDir": "dist/types",
     "sourceMap": true,
     "strict": true,
     "declaration": true,
@@ -8,7 +9,7 @@
     "strictPropertyInitialization": true,
     "moduleResolution": "node",
     "target": "ESNext",
-    "module": "ESNext",
+    "module": "commonjs",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,

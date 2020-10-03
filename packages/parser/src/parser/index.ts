@@ -1,6 +1,6 @@
 import { TokenKind, Scanner } from '../tokenizer';
 import { errorText } from './constant';
-import { clone } from '../../utils/object';
+import { clone } from '@xvue/utils/object';
 
 import * as utils from './utils';
 

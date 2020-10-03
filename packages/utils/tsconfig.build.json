@@ -1,8 +1,8 @@
 {
-    "extends": "./tsconfig.json",
-    "compilerOptions": {
-        "outDir": ".",
-        "sourceMap": false
-    },
-    "include": ["src", "typings"]
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": ".",
+    "sourceMap": false
+  },
+  "include": ["src", "typings"]
 }
