@@ -17,6 +17,7 @@ import type {
   FoldingRange,
   SelectionRange,
   WorkspaceEdit,
+  Location,
 } from 'vscode-languageserver-types';
 
 export const languageId = 'mdx';
@@ -24,9 +25,9 @@ export const languageId = 'mdx';
 export type UnDef = null | undefined | void;
 
 export interface CompletionItemData {
-  filePath: string;
-  virtualPath: string;
+  uri: string;
   triggerChar: string;
+  source?: string;
   offset: number;
   languageId: string;
   subLanguageId?: string;

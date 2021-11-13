@@ -28,12 +28,6 @@ export function findDefinition(
     return [];
   }
 
-  // const program = server.getProgram();
-
-  // if (!program) {
-  //   return [];
-  // }
-
   const definitionResults: Location[] = definitions
     .map(({ fileName, textSpan }) => {
       // node_modules 中的虚拟文件
