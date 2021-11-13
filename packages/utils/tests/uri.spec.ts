@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { toFsPath, toURI, normalize, isSubpath, dirnames } from '../src';
+import { toFsPath, toURI, normalize, isSubpath, replaceSuffix, dirnames } from '../src';
 
 test('normalize', ({ is }) => {
   const path1 = '/user\\/xiao/\\//file.txt';
@@ -45,4 +45,16 @@ test('dirnames', ({ deepEqual }) => {
     'C:/user',
     'C:/',
   ]);
+});
+
+test('replace-suffix', ({ is }) => {
+  const getUnixPath = (ext: string) => `/User/xxx/text1${ext}`;
+  const getWindowsPath = (ext: string) => `c:/test/abc/dddd/text2${ext}`;
+  const checkSuffix = (ext: string) => {
+    is(replaceSuffix(getUnixPath('.js'), ext), normalize(getUnixPath(ext)));
+    is(replaceSuffix(getWindowsPath('.js'), ext), normalize(getWindowsPath(ext)));
+  };
+
+  checkSuffix('.test');
+  checkSuffix('.abcd');
 });

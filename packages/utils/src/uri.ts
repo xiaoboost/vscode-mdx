@@ -1,5 +1,5 @@
 import { URI } from 'vscode-uri';
-import { dirname } from 'path';
+import { dirname, parse, format } from 'path';
 
 export function toFsPath(uri: string) {
   return normalize(URI.parse(uri).fsPath);
@@ -66,4 +66,15 @@ export function dirnames(target: string) {
   result.push(current);
 
   return result;
+}
+
+export function replaceSuffix(fileName: string, extname: string) {
+  const name = parse(fileName);
+
+  return normalize(format({
+    root: name.root,
+    dir: name.dir,
+    name: name.base.replace(name.ext, ''),
+    ext: extname,
+  }));
 }
