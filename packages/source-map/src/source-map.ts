@@ -163,6 +163,12 @@ export class SourceMap {
   isMappedRange(start: number, end: number) {
     return this.getRanges(start, end, true).length > 0;
   }
+  getSourceRange(start: number, end: number): OffsetRange | undefined {
+    return this.getRanges(start, end, false)[0];
+  }
+  getMappedRange(start: number, end: number): OffsetRange | undefined {
+    return this.getRanges(start, end, true)[0];
+  }
   getSourceRanges(start: number, end: number) {
     return this.getRanges(start, end, false);
   }

@@ -85,4 +85,5 @@ export {
   Range,
   MarkupContent,
   MarkupKind,
+  Location,
 } from 'vscode-languageserver';
