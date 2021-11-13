@@ -8,13 +8,18 @@ export interface TransformedData {
 
 /** 代码转换结果 */
 export interface TransformResult {
+  indexCode: TransformedData;
   jsxCode: TransformedData;
   mdCode: TransformedData;
   blockCodes: TransformedData[];
 }
 
 export interface TransformContext extends TransformResult {
-  basename: string;
+  /**
+   * 原始文件名
+   *  - 单纯的文件名，没有路径
+   */
+  fileName: string;
 }
 
 export interface Transformer {

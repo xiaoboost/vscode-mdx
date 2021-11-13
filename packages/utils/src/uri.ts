@@ -38,6 +38,7 @@ const endSlash = new RegExp(`${slash.source}$`);
 const windowStart = /^[a-zA-Z]:\/$/;
 const windowStartPath = /^[a-z]:\/([^/]|$)/;
 
+/** 标准化路径 */
 export function normalize(fsPath: string) {
   let normalized = fsPath.replace(slashGlobal, '/');
 
@@ -68,6 +69,7 @@ export function dirnames(target: string) {
   return result;
 }
 
+/** 替换路径后缀 */
 export function replaceSuffix(fileName: string, extname: string) {
   const name = parse(fileName);
 
@@ -77,4 +79,9 @@ export function replaceSuffix(fileName: string, extname: string) {
     name: name.base.replace(name.ext, ''),
     ext: extname,
   }));
+}
+
+/** 去除`ts/js`文件后缀  */
+export function removeTsSuffix(fileName: string) {
+  return fileName.replace(/(\.d)?\.(t|j)sx?$/, '');
 }

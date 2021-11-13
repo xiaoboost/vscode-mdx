@@ -1,32 +1,54 @@
 import { Root } from '../parser';
-import { transform as origin } from './transform';
 import { CodeGen } from '@mdx/source-map';
-import { MdxJsxSuffix, MdxMdSuffix } from '@mdx/utils';
+import { transform as realTransform } from './transform';
+import { getMdxFileName, MdxFileType, removeTsSuffix } from '@mdx/utils';
 
 import type { TransformResult, TransformContext } from './utils';
 export type { TransformResult, TransformedData } from './utils';
 
-export function transform(ast: Root, filename: string): TransformResult {
+/** jsx 代码预处理 */
+function beforeTransformJsx(jsxCode: CodeGen) {
+  jsxCode.addText('import React from \'react\';\n\n');
+}
+
+/** index 代码预处理 */
+function beforeTransformIndex(indexCode: CodeGen, filename: string) {
+  indexCode.addText(`
+import { FC } from 'react';
+import { MDXProviderProps } from '@types/mdx-js__react';
+
+const MDXComponent: FC<Partial<MDXProviderProps>>;
+export default MDXComponent;
+
+export * from './${removeTsSuffix(getMdxFileName(filename, MdxFileType.MainJsx))}';
+`.trimLeft());
+}
+
+export function transform(ast: Root, fileName: string): TransformResult {
+  const indexCodeGen = new CodeGen();
   const jsxCodeGen = new CodeGen();
   const mdCodeGen = new CodeGen();
-  const basename = filename.replace(/\.[^.]*$/, '');
   const context: TransformContext = {
-    basename,
-    mdCode: {
-      filename: `${basename}${MdxMdSuffix}`,
+    fileName,
+    indexCode: {
+      filename: getMdxFileName(fileName, MdxFileType.Index),
+      codeGen: indexCodeGen,
+    },
+    mdCode:  {
+      filename: getMdxFileName(fileName, MdxFileType.MainMd),
       codeGen: mdCodeGen,
     },
     jsxCode: {
-      filename: `${basename}${MdxJsxSuffix}`,
+      filename: getMdxFileName(fileName, MdxFileType.MainJsx),
       codeGen: jsxCodeGen,
     },
     blockCodes: [],
   };
 
-  // jsx 代码默认需要加入 react
-  jsxCodeGen.addText('import React from \'react\';\n\n');
+  beforeTransformJsx(jsxCodeGen);
+  beforeTransformIndex(indexCodeGen, fileName);
 
-  origin(ast, context);
+  realTransform(ast, context);
 
   return context;
 }

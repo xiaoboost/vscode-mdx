@@ -1,6 +1,6 @@
 import type * as ts from 'typescript';
 
-import { isMdxJsx } from '@mdx/utils';
+// import { isMdxJsx } from '@mdx/utils';
 
 interface ModuleResolutionData {
   [containingFile: string]: {

@@ -20,8 +20,7 @@ import {
   toURI,
   normalize,
   dirnames,
-  isMdFile,
-  isMdxFile
+  isMdxFile,
 } from '@mdx/utils';
 
 export class DiskController {
@@ -82,7 +81,7 @@ export class DiskController {
 
       // 文件系统中删除
       if (event.type === FileChangeType.Deleted) {
-        if (isMdFile(fsPath) || isMdxFile(fsPath)) {
+        if (isMdxFile(fsPath)) {
           // TODO:
         }
         else {
@@ -92,7 +91,7 @@ export class DiskController {
       // 编辑器中关闭
       else if (event.type === FileChangeType.Closed) {
         // 只有 md 文件需要检测是否从缓存中删除
-        if (isMdFile(fsPath) || isMdxFile(fsPath)) {
+        if (isMdxFile(fsPath)) {
           // TODO:
         }
       }
@@ -105,7 +104,7 @@ export class DiskController {
           continue;
         }
 
-        if (isMdFile(fsPath) || isMdxFile(fsPath)) {
+        if (isMdxFile(fsPath)) {
           const code = (
             this.getCode(fsPath)
               ?? new MdxCode(event.document, this)

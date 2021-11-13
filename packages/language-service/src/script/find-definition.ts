@@ -9,8 +9,8 @@ import {
   toFsPath,
   normalize,
   virtualSchemeName,
-  isMdxJsx,
-  isMdCodeBlock,
+  getMdxFileType,
+  MdxFileType,
 } from '@mdx/utils';
 
 export function findDefinition(
@@ -30,6 +30,8 @@ export function findDefinition(
 
   const definitionResults: Location[] = definitions
     .map(({ fileName, textSpan }) => {
+      const mdxKind = getMdxFileType(fileName);
+
       // node_modules 中的虚拟文件
       if (fs.readFile(fileName) && /[\\/]node_modules[\\/].*\.d\.ts$/.test(fileName)) {
         const libPath = normalize(fileName.replace(/^.*[\\/]node_modules/, 'node_modules'));
@@ -43,7 +45,7 @@ export function findDefinition(
         };
       }
       // 拆解出来的文件
-      else if (isMdxJsx(fileName) || isMdCodeBlock(fileName)) {
+      else if (mdxKind === MdxFileType.MainJsx || mdxKind === MdxFileType.CodeBlock) {
         const startOffset = textSpan.start;
         const endOffset = textSpan.start + textSpan.length;
         const code = fs.getCode(fileName);
@@ -62,6 +64,11 @@ export function findDefinition(
             end: sourceDocument.positionAt(sourceRange.end),
           },
         };
+      }
+      // 入口文件
+      else if (mdxKind === MdxFileType.Index) {
+        // TODO:
+        return;
       }
       // 原生脚本文件
       else {

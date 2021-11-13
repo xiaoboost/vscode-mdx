@@ -1,6 +1,14 @@
 import test from 'ava';
 
-import { toFsPath, toURI, normalize, isSubpath, replaceSuffix, dirnames } from '../src';
+import {
+  toFsPath,
+  toURI,
+  normalize,
+  isSubpath,
+  replaceSuffix,
+  dirnames,
+  removeTsSuffix,
+} from '../src';
 
 test('normalize', ({ is }) => {
   const path1 = '/user\\/xiao/\\//file.txt';
@@ -47,9 +55,10 @@ test('dirnames', ({ deepEqual }) => {
   ]);
 });
 
+const getUnixPath = (ext: string) => `/User/xxx/text1${ext}`;
+const getWindowsPath = (ext: string) => `c:/test/abc/dddd/text2${ext}`;
+
 test('replace-suffix', ({ is }) => {
-  const getUnixPath = (ext: string) => `/User/xxx/text1${ext}`;
-  const getWindowsPath = (ext: string) => `c:/test/abc/dddd/text2${ext}`;
   const checkSuffix = (ext: string) => {
     is(replaceSuffix(getUnixPath('.js'), ext), normalize(getUnixPath(ext)));
     is(replaceSuffix(getWindowsPath('.js'), ext), normalize(getWindowsPath(ext)));
@@ -57,4 +66,21 @@ test('replace-suffix', ({ is }) => {
 
   checkSuffix('.test');
   checkSuffix('.abcd');
+});
+
+test('remove-ts-suffix', ({ is }) => {
+  const checkSuffix = (ext: string, isRemove: boolean) => {
+    const ext2 = isRemove ? '' : ext;
+    is(removeTsSuffix(getUnixPath(ext)), normalize(getUnixPath(ext2)));
+    is(removeTsSuffix(getUnixPath(ext)), normalize(getUnixPath(ext2)));
+  };
+
+  // 去除后缀
+  checkSuffix('.js', true);
+  checkSuffix('.tsx', true);
+  checkSuffix('.d.ts', true);
+
+  // 不去除后缀
+  checkSuffix('.test', false);
+  checkSuffix('.test2', false);
 });

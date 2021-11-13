@@ -3,7 +3,7 @@ import { replaceSuffix } from './uri';
 
 export const MDXSuffix = '.mdx';
 export const MDSuffix = '.md';
-export const IndexSuffix = '.mdx_index.d.ts';
+export const IndexSuffix = '._mdx_index.d.ts';
 export const MainJsxSuffix = '._mdx.jsx';
 export const MainMdSuffix = '._mdx.md';
 export const getMdCodeBlockSuffix = (index: number, suffix: ScriptLang) => {

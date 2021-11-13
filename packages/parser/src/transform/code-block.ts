@@ -1,7 +1,7 @@
 import { NodeType, Node, CodeBlock } from '../parser';
 import { TransformContext } from './utils';
 import { Mode, CodeGen } from '@mdx/source-map';
-import { NULL_EXPORT, MdCodeBlockSuffix } from '@mdx/utils';
+import { NULL_EXPORT, removeTsSuffix, getMdxFileName, MdxFileType } from '@mdx/utils';
 
 const langMap = {
   ts: 'ts',
@@ -22,18 +22,17 @@ export function test(node: Node) {
 }
 
 export function transform(node: CodeBlock, context: TransformContext) {
-  const { blockCodes, jsxCode } = context;
+  const { blockCodes, indexCode } = context;
   const codeGen = new CodeGen();
-  const suffix = MdCodeBlockSuffix(langMap[node.lang!]);
-  const filename = `${context.basename}.${blockCodes.length}${suffix}`;
+  const filename = getMdxFileName(
+    context.fileName,
+    MdxFileType.CodeBlock,
+    blockCodes.length,
+    langMap[node.lang!],
+  );
 
   codeGen.addCode(node.text, Mode.Offset, node.range);
   codeGen.addText(`\n\n;${NULL_EXPORT}`);
-
-  blockCodes.push({
-    filename,
-    codeGen,
-  });
-
-  jsxCode.codeGen.addText(`;\nimport './${filename.replace(/\.(j|t)sx?$/, '')}';\n`);
+  blockCodes.push({ filename, codeGen });
+  indexCode.codeGen.addText(`\nimport './${removeTsSuffix(filename)}';\n`);
 }
