@@ -19,7 +19,7 @@
     "@mdx/language-service": "workspace:*",
     "@mdx/utils": "workspace:*",
     "@xiao-ai/utils": "^1.4.3",
-    "compare-versions": "^3.6.0",
+    "compare-versions": "^4.1.1",
     "vscode-languageserver": "^7.0.0",
     "vscode-languageserver-textdocument": "^1.0.2"
   },
