@@ -2,8 +2,13 @@ import { ServiceHost } from '@mdx/language-host-typescript';
 import { DiskController } from '@mdx/file-system';
 import { toFsPath } from '@mdx/utils';
 import { tsModule, fileSystem } from './utils';
-import { getLanguageService, LanguageService } from '@mdx/language-service';
 import { fs as vfs } from '../store';
+
+import {
+  getLanguageService,
+  LanguageService,
+  CompletionItem,
+} from '@mdx/language-service';
 
 import type { TextDocument } from 'vscode-languageserver-textdocument';
 
@@ -37,6 +42,12 @@ export class ProjectServer implements Omit<LanguageService, 'getId'> {
   }
   doComplete(text: TextDocument, position: Position) {
     return this.language.doComplete?.(text, position);
+  }
+  doResolve(item: CompletionItem) {
+    return this.language.doResolve?.(item) ?? item;
+  }
+  findDefinition(text: TextDocument, position: Position) {
+    return this.language.findDefinition?.(text, position);
   }
 
   dispose() {

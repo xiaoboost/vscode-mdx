@@ -5,7 +5,7 @@ import {
 
 import { lsp, fs, documents, projects } from './store';
 import { FileChangeType, FileEvent } from '@mdx/file-system';
-import { capabilities } from '@mdx/language-service';
+import { capabilities, CompletionItemData } from '@mdx/language-service';
 import { toFsPath } from '@mdx/utils';
 import { debounce } from '@xiao-ai/utils';
 
@@ -84,39 +84,31 @@ lsp.onInitialized(() => {
     return project.doHover(doc, position) ?? null;
   });
 
-  // lsp.onCompletion(param => {
-  //   return projects.find(toFsPath(param.textDocument.uri))?.onCompletion(param);
-  // });
+  lsp.onCompletion(({ textDocument, position }) => {
+    const doc = documents.get(textDocument.uri);
+    const project = projects.find(toFsPath(textDocument.uri));
 
-  // lsp.onCompletionResolve(item => {
-  //   if (item.data?.fsPath) {
-  //     return projects.find(item.data.fsPath)?.onResolve(item) ?? item;
-  //   }
+    if (!doc || !project) {
+      return;
+    }
 
-  //   return item;
-  // });
+    return project.doComplete(doc, position) ?? [];
+  });
 
-  // lsp.onColorPresentation(param => {
-  //   return projects.find(toFsPath(param.textDocument.uri))?.onColorPresentation(param) ?? [];
-  // });
+  lsp.onCompletionResolve(item => {
+    const data = item.data as CompletionItemData;
+    const project = projects.find(toFsPath(data.uri));
+    return project ? project.doResolve(item) : item;
+  });
 
-  // lsp.onDocumentColor(param => {
-  //   return projects.find(toFsPath(param.textDocument.uri))?.onDocumentColor(param) ?? [];
-  // });
+  lsp.onDefinition(({ textDocument, position }) => {
+    const doc = documents.get(textDocument.uri);
+    const project = projects.find(toFsPath(textDocument.uri));
 
-  // lsp.onDefinition(param => {
-  //   return projects.find(toFsPath(param.textDocument.uri))?.onDefinition(param);
-  // });
+    if (!doc || !project) {
+      return;
+    }
 
-  // lsp.onReferences(param => {
-  //   return projects.find(toFsPath(param.textDocument.uri))?.onReferences(param) ?? null;
-  // });
-
-  // lsp.onDocumentLinks(param => {
-  //   return projects.find(toFsPath(param.textDocument.uri))?.onDocumentLinks(param);
-  // });
-
-  // lsp.onDocumentSymbol(param => {
-  //   return projects.find(toFsPath(param.textDocument.uri))?.onDocumentSymbol(param) ?? null;
-  // });
+    return project.findDefinition(doc, position) ?? [];
+  });
 });

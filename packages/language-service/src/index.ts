@@ -15,6 +15,7 @@ import {
   Position,
   TextDocument,
   CompletionList,
+  CompletionItemData,
 } from './types';
 
 export * from './types';
@@ -22,12 +23,12 @@ export * from './types';
 export const capabilities: ServerCapabilities = {
   textDocumentSync: TextDocumentSyncKind.Incremental,
   hoverProvider: true,
-  // completionProvider: {
-  //   triggerCharacters: ['.', ':', '<', '"', "'", '/', '@', '*'], // .concat(lowerLetter),
-  //   resolveProvider: true,
-  // },
-  // definitionProvider: true,
-  // // referencesProvider: true,
+  completionProvider: {
+    triggerCharacters: ['.', ':', '<', '"', "'", '/', '@', '*'], // .concat(lowerLetter),
+    resolveProvider: true,
+  },
+  definitionProvider: true,
+  // referencesProvider: true,
   // documentLinkProvider: {
   //   resolveProvider: false,
   // },
@@ -171,14 +172,15 @@ export function getLanguageService(fs: DiskController, host: ServiceHost): Langu
         }),
       };
     },
-    // doResolve(item) {
-    //   const id = item.data?.subLanguageId;
-    //   const mode = services[id] as mdx.LanguageService | undefined;
-    //   return mode?.doResolve?.(item) ?? item;
-    // },
-    // findDefinition(text, position) {
-    //   const context = createCodeContext(text, position);
-    //   return context?.mode.findDefinition?.(context.text, context.position);
-    // },
+    doResolve(item) {
+      const data = item.data as CompletionItemData;
+      const id = data?.subLanguageId;
+      const mode = services[id ?? ''] as LanguageService | undefined;
+      return mode?.doResolve?.(item) ?? item;
+    },
+    findDefinition(text, position) {
+      const context = createCodeContext(text, position);
+      return context?.mode.findDefinition?.(context.text, context.position);
+    },
   };
 }
