@@ -158,10 +158,10 @@ export class SourceMap {
   }
 
   isSourceRange(start: number, end: number) {
-    return this.getRanges(start, end, false).length > 0;
+    return this.getRanges(start, end, true).length > 0;
   }
   isMappedRange(start: number, end: number) {
-    return this.getRanges(start, end, true).length > 0;
+    return this.getRanges(start, end, false).length > 0;
   }
   getSourceRange(start: number, end: number): OffsetRange | undefined {
     return this.getRanges(start, end, false)[0];
@@ -177,10 +177,10 @@ export class SourceMap {
   }
 
   isSourceOffset(offset: number) {
-    return this.getOffsets(offset, false).length > 0;
+    return this.getOffsets(offset, true).length > 0;
   }
   isMappedOffset(offset: number) {
-    return this.getOffsets(offset, true).length > 0;
+    return this.getOffsets(offset, false).length > 0;
   }
   getSourceOffset(offset: number): number | undefined {
     return this.getOffsets(offset, false)[0];

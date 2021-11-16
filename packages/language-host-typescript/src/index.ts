@@ -9,7 +9,7 @@ import { unique } from '@xiao-ai/utils';
 import { SnapshotCache } from './cache/snapshot';
 import { ModuleResolutionCache } from './cache/module-resolution';
 import { TsConfigData, ServiceHostFileSystem } from './types';
-import { isSubpath, toFsPath } from '@mdx/utils';
+import { isSubpath, toFsPath, printer } from '@mdx/utils';
 
 import {
   getScriptKind,
@@ -199,9 +199,7 @@ export class ServiceHost {
           }
         }
 
-        if (process.env.NODE_ENV === 'development') {
-          console.log('getScriptSnapshot', fileName);
-        }
+        // printer.log('getScriptSnapshot', fileName);
 
         // 映射至虚拟文件地址
         // const fsPath = this.getVirtualPath(fileName);

@@ -37,7 +37,7 @@ lsp.onInitialized(() => {
         });
       }
     }
-  });
+  }, 50);
 
   documents.onDidOpen(({ document }) => {
     fs.filesChange({ changes: [{ type: FileChangeType.Created, document }] });

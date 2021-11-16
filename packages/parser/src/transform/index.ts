@@ -15,7 +15,7 @@ function beforeTransformJsx(jsxCode: CodeGen) {
 function beforeTransformIndex(indexCode: CodeGen, filename: string) {
   indexCode.addText(`
 import { FC } from 'react';
-import { MDXProviderProps } from '@types/mdx-js__react';
+import { MDXProviderProps } from '@mdx-js/react';
 
 const MDXComponent: FC<Partial<MDXProviderProps>>;
 export default MDXComponent;
