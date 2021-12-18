@@ -9,13 +9,13 @@ export * from './types';
 
 /** Token 标记扫描器 */
 export class Scanner {
-  protected readonly _pointer: CodePointer;
-  protected _tokenType: TokenType;
-  protected _tokenStart = 0;
-  protected _tokenError?: string;
-  protected _state: ScannerState;
-  protected _lastState: ScannerState;
-  protected _options: ParserOptions;
+  private readonly _pointer: CodePointer;
+  private _tokenType: TokenType;
+  private _tokenStart = 0;
+  private _tokenError?: string;
+  private _state: ScannerState;
+  private _lastState: ScannerState;
+  private _options: ParserOptions;
 
   constructor(code: string, opt: ParserOptions) {
     this._pointer = new CodePointer(code);
@@ -65,7 +65,7 @@ export class Scanner {
   }
 
   /** 设置当前标识符 */
-  protected finishToken(start: number, type: TokenType, errorMessage?: string) {
+  private finishToken(start: number, type: TokenType, errorMessage?: string) {
     this._tokenType = type;
     this._tokenStart = start;
     this._tokenError = errorMessage;
@@ -73,7 +73,7 @@ export class Scanner {
   }
 
   /** 跳过字符串字面量 */
-  protected nextString() {
+  private nextString() {
     const { _pointer: pointer } = this;
     const mark = pointer.peekChar(-1);
     const splitChars = newlineChars.concat(charCode.Slash, mark);
@@ -93,7 +93,7 @@ export class Scanner {
   }
 
   /** 跳过模板字符串 */
-  protected nextTemplateString() {
+  private nextTemplateString() {
     const { _pointer: pointer } = this;
 
     while (!pointer.eos) {
@@ -115,7 +115,7 @@ export class Scanner {
   }
 
   /** 跳过 JS 注释 */
-  protected nextJsComment() {
+  private nextJsComment() {
     const { _pointer: pointer } = this;
     const lastChar = pointer.peekChar(-1);
 
@@ -130,7 +130,7 @@ export class Scanner {
   }
 
   /** 跳过 import 语句 */
-  protected nextImport() {
+  private nextImport() {
     const { _pointer: pointer } = this;
 
     let state = ScannerImportState.BeforeFromIdentifier;
@@ -175,12 +175,12 @@ export class Scanner {
   }
 
   /** 跳过 export 语句 */
-  protected nextExport() {
+  private nextExport() {
     // ..
   }
 
   /** 跳过 JS 公共语句 */
-  protected nextJsCommon() {
+  private nextJsCommon() {
     const { _pointer: pointer } = this;
 
     // 引号
@@ -211,7 +211,7 @@ export class Scanner {
   }
 
   /** 跳过 jsx 表达式 */
-  protected nextJsxExpression() {
+  private nextJsxExpression() {
     const { _pointer: pointer } = this;
 
     let deep = 1;
@@ -287,7 +287,7 @@ export class Scanner {
   }
 
   /** 跳过代码块 */
-  protected nextBlockExpression() {
+  private nextBlockExpression() {
     const { _pointer: pointer } = this;
 
     while (!pointer.eos) {
@@ -306,8 +306,9 @@ export class Scanner {
 
   /** 扫描下一个标记 */
   scan(): TokenType {
-    const { _pointer: pointer } = this;
+    const { _pointer: pointer, _options: options } = this;
     const { pos: startOffset } = pointer;
+    const { isMdx } = options;
 
     if (pointer.eos) {
       return this.finishToken(pointer.pos, TokenType.EOS);

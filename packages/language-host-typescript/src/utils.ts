@@ -34,7 +34,12 @@ export function getDefaultTsConfig(): TsConfigData {
   };
 }
 
-export enum ConfigFile {
-  Ts = 'tsconfig.json',
-  Js = 'jsconfig.json',
+export enum ConfigFileKind {
+  Ts,
+  Js,
 }
+
+export const ConfigFileName = {
+  [ConfigFileKind.Ts]: 'tsconfig.json',
+  [ConfigFileKind.Js]: 'jsconfig.json',
+};

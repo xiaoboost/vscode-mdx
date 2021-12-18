@@ -14,7 +14,8 @@ import { isSubpath, toFsPath, printer } from '@mdx/utils';
 import {
   getScriptKind,
   getDefaultTsConfig,
-  ConfigFile,
+  ConfigFileKind,
+  ConfigFileName,
 } from './utils';
 
 import {
@@ -47,11 +48,8 @@ export class ServiceHost {
   private vfs: DiskController;
   /** 编译选项 */
   private tsConfigData: TsConfigData = getDefaultTsConfig();
-  /**
-   * 使用 tsconfig.json 文件
-   *  - 否则使用 jsconfig.json
-   */
-  private useTsConfig = true;
+  /** 配置文件 */
+  private useConfig = ConfigFileKind.Js;
 
   /** js/ts 语言服务器 */
   private jsHost: ts.LanguageServiceHost;
@@ -240,11 +238,11 @@ export class ServiceHost {
   /** 读取配置文件 */
   private readConfigFile() {
     // 优先读取 tsconfig
-    let configFilePath = path.join(this.root, ConfigFile.Ts);
+    let configFilePath = path.join(this.root, ConfigFileName[ConfigFileKind.Ts]);
     let configFile = this.mdxSys.readFile(configFilePath);
 
     if (configFile) {
-      this.useTsConfig = true;
+      this.useConfig = ConfigFileKind.Ts;
       this.tsConfigData = this.tsModule.readConfigFile(
         configFilePath,
         this.mdxSys.readFile
@@ -252,19 +250,16 @@ export class ServiceHost {
     }
     // 否则再读取 jsconfig
     else {
-      configFilePath = path.join(this.root, ConfigFile.Js);
+      configFilePath = path.join(this.root, ConfigFileName[ConfigFileKind.Js]);
       configFile = this.mdxSys.readFile(configFilePath);
 
-      this.useTsConfig = false;
+      this.useConfig = ConfigFileKind.Js;
 
       if (configFile) {
         this.tsConfigData = this.tsModule.readConfigFile(
           configFilePath,
           this.mdxSys.readFile
         ).config;
-
-        // jsconfig 需要强制设置 allowJs 为 true
-        this.tsConfigData.compilerOptions.allowJs = true;
       }
       // 不存在配置文件，则取默认值
       else {
@@ -272,6 +267,8 @@ export class ServiceHost {
       }
     }
 
+    // 强制设置 allowJs 为 true，因为 mdx 文件默认是 jsx
+    this.tsConfigData.compilerOptions.allowJs = true;
     this.tsConfigData.include = this.tsConfigData.include ?? [];
     this.tsConfigData.exclude = unique(
       ['node_modules'].concat(this.tsConfigData.exclude ?? [])
@@ -369,15 +366,15 @@ export class ServiceHost {
       const extname = path.extname(fsPath);
 
       // tsconfig 变更
-      if (fsPath === path.join(this.root, ConfigFile.Ts)) {
-        this.useTsConfig = true;
+      if (fsPath === path.join(this.root, ConfigFileName[ConfigFileKind.Ts])) {
+        this.useConfig = ConfigFileKind.Ts;
         this.readConfigFile();
         projectChange = true;
       }
       // jsconfig 变更
-      else if (fsPath === path.join(this.root, ConfigFile.Js)) {
+      else if (fsPath === path.join(this.root, ConfigFileName[ConfigFileKind.Js])) {
         // 只有使用 js 配置文件时才重新读取配置
-        if (!this.useTsConfig) {
+        if (this.useConfig === ConfigFileKind.Js) {
           this.readConfigFile();
           projectChange = true;
         }
@@ -395,7 +392,6 @@ export class ServiceHost {
       }
     }
 
-    console.log('host-server change');
     this.projectVersion += projectChange ? 1 : 0;
   }
   /** 获取编译选项 */
