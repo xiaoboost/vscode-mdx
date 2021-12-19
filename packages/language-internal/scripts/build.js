@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const Glob = require('fast-glob');
 const outDir = path.resolve(__dirname, '../dist');
-const libs = ['@types/node', '@types/react', '@types/mdx-js__react', 'typescript'];
+const libs = ['@types/node', '@types/react', 'typescript'];
 
 async function writeData() {
   const files = {};

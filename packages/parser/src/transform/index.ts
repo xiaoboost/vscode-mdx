@@ -15,13 +15,12 @@ function beforeTransformJsx(jsxCode: CodeGen) {
 function beforeTransformIndex(indexCode: CodeGen, filename: string) {
   indexCode.addText(`
 import { FC } from 'react';
-import { MDXProviderProps } from '@mdx-js/react';
 
-const MDXComponent: FC<Partial<MDXProviderProps>>;
+declare const MDXComponent: FC<Record<string, any>>;
 export default MDXComponent;
 
 export * from './${removeTsSuffix(getMdxFileName(filename, MdxFileType.MainJsx))}';
-`.trimLeft());
+`.trim());
 }
 
 export function transform(ast: Root, fileName: string): TransformResult {

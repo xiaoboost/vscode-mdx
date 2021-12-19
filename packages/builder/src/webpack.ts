@@ -134,7 +134,7 @@ function getBaseConfig(opt: Options): webpack.Configuration {
             to({ absoluteFilename }) {
               return path.relative(
                 resolve('node_modules/@mdx/language-syntax/dist'),
-                absoluteFilename,
+                absoluteFilename ?? '',
               );
             },
           },

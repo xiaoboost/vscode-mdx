@@ -16,28 +16,27 @@
     "@mdx/client": "workspace:*",
     "@mdx/language-server": "workspace:*",
     "@mdx/language-syntax": "workspace:*",
-    "vsce": "^2.3.0"
+    "vsce": "^2.5.3"
   },
   "devDependencies": {
     "@mdx/tsconfig": "workspace:*",
     "@mdx/utils": "workspace:*",
-    "@types/copy-webpack-plugin": "^8.0.1",
     "@types/mdx": "workspace:*",
-    "@types/node": "^16.11.7",
+    "@types/node": "^17.0.0",
     "@types/webpack-bundle-analyzer": "^4.4.1",
-    "@types/yargs": "^17.0.5",
-    "chalk": "^4.1.2",
-    "copy-webpack-plugin": "^9.1.0",
-    "esbuild-loader": "^2.16.0",
+    "@types/yargs": "^17.0.7",
+    "chalk": "4.1.2",
+    "copy-webpack-plugin": "^10.2.0",
+    "esbuild-loader": "^2.17.0",
     "generate-json-webpack-plugin": "^2.0.0",
     "progress-bar-webpack-plugin": "^2.1.0",
     "require-split-chunk-webpack-plugin": "^2.0.2",
-    "terser-webpack-plugin": "^5.2.5",
+    "terser-webpack-plugin": "^5.3.0",
     "ts-loader": "^9.2.6",
     "tslib": "^2.3.1",
-    "typescript": "^4.4.4",
-    "webpack": "^5.64.1",
+    "typescript": "^4.5.4",
+    "webpack": "^5.65.0",
     "webpack-bundle-analyzer": "^4.5.0",
-    "yargs": "^17.2.1"
+    "yargs": "^17.3.0"
   }
 }

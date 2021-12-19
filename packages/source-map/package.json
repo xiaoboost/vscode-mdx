@@ -12,14 +12,14 @@
     "lint:fix": "eslint --fix --quiet --no-error-on-unmatched-pattern --config ../../.eslintrc.js src/**/*.{ts,tsx,js,jsx}"
   },
   "dependencies": {
-    "vscode-languageserver-textdocument": "^1.0.2"
+    "vscode-languageserver-textdocument": "^1.0.3"
   },
   "devDependencies": {
     "@mdx/tsconfig": "workspace:*",
     "@mdx/utils": "workspace:*",
     "@types/mdx": "workspace:*",
-    "eslint": "^8.2.0",
+    "eslint": "^8.5.0",
     "tslib": "^2.3.1",
-    "typescript": "^4.4.4"
+    "typescript": "^4.5.4"
   }
 }
